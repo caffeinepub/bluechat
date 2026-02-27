@@ -1,0 +1,21 @@
+{
+  "backend/main.mo": "Motoko actor implementing a simple messaging backend with per-conversation message storage, supporting post, get, and clear operations keyed by conversation ID.",
+  "feature_evidence.json": "Feature evidence report confirming that the 'XetaChat' app name update was implemented in frontend/src/App.tsx with high confidence.",
+  "frontend-file-summaries.txt": "JSON document containing one-sentence summaries of each frontend source file, describing their purpose and key implementation details.",
+  "frontend/index.css": "Tailwind CSS entry file defining light and dark CSS custom property themes for colors, borders, and sidebar using oklch-style values.",
+  "frontend/index.html": "HTML entry point titled 'BlueChat' that mounts the React app at the root div and loads the main TypeScript module.",
+  "frontend/src/App.tsx": "Root React component that manages Bluetooth state, routes between the pairing and chat views, and renders the 'XetaChat' header with signal bar decoration and a connection status bar.",
+  "frontend/src/components/BluetoothPairing.tsx": "Full-screen pairing UI component showing animated scan rings, a Bluetooth logo, status text, and a scan button with browser support and error handling.",
+  "frontend/src/components/ChatInterface.tsx": "Main chat view component with an auto-scrolling message list, text input with Enter-to-send, Bluetooth message sending, backend persistence via React Query, and a clear-conversation dialog.",
+  "frontend/src/components/ConnectionStatus.tsx": "Status bar component that displays the current Bluetooth connection state with an animated indicator dot, device name, and connect/disconnect action buttons.",
+  "frontend/src/components/MessageBubble.tsx": "React component that renders a single chat message bubble with sender label, styled differently for sent vs. received messages, and a formatted timestamp.",
+  "frontend/src/hooks/useActor.ts": "Custom hook that creates and caches an ICP backend actor (authenticated or anonymous) using React Query, and invalidates dependent queries when the identity changes.",
+  "frontend/src/hooks/useBluetooth.ts": "Custom hook that manages Web Bluetooth connectivity using the Nordic UART Service, exposing scan, connect, disconnect, send, and message state for BLE-based chat.",
+  "frontend/src/hooks/useInternetIdentity.ts": "Provides an Internet Identity authentication context and provider, wrapping DFINITY's AuthClient to expose login, logout, and identity state to the React component tree.",
+  "frontend/src/hooks/useQueries.ts": "Defines React Query hooks for fetching, posting, and clearing messages on the ICP backend, with polling and cache invalidation.",
+  "frontend/src/index.css": "Global stylesheet that imports fonts, configures Tailwind, and defines CSS custom properties for a dark navy/cyan color theme including chat bubble and glow tokens.",
+  "frontend/src/main.tsx": "Application entry point that mounts the React app wrapped with QueryClientProvider and InternetIdentityProvider.",
+  "frontend/src/types/web-bluetooth.d.ts": "Local TypeScript declaration file that defines Web Bluetooth API types (devices, GATT services, characteristics, etc.) absent from the default DOM lib.",
+  "frontend/tailwind.config.js": "Tailwind CSS configuration defining dark mode, custom color palette (navy/cyan theme using oklch), typography, border radius, box shadow, and plugin setup for a dark-mode Bluetooth chat app.",
+  "project_state.json": "Project state manifest tracking version, summary, architectural notes, known issues, and a list of implemented features for a Bluetooth peer-to-peer messaging app built with a Web Bluetooth API frontend."
+}

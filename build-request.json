@@ -1,0 +1,36 @@
+{
+  "kind": "build_request",
+  "title": "Update app name to XetaChat in top bar",
+  "projectName": "XetaChat",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-8",
+      "text": "Update the app header/top bar in App.tsx to display 'XetaChat' as the app name, replacing any previous name or placeholder text currently shown there.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "in the app change the name from top bar too",
+          "change its name to XetaChat"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The top bar/header visibly displays 'XetaChat' as the app name on all screens",
+        "No previous app name or placeholder text remains in the header",
+        "The change is consistent across both the pairing view and the chat view"
+      ]
+    }
+  ],
+  "constraints": [],
+  "nonGoals": [
+    "Changing any other UI text or labels beyond the top bar app name",
+    "Modifying the backend"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

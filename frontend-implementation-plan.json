@@ -1,0 +1,28 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Update app name to XetaChat in top bar",
+  "requirements": [
+    {
+      "id": "REQ-8",
+      "summary": "Update the app header/top bar to display 'XetaChat' as the app name",
+      "acceptanceCriteria": [
+        "The top bar/header visibly displays 'XetaChat' as the app name on all screens",
+        "No previous app name or placeholder text remains in the header",
+        "The change is consistent across both the pairing view and the chat view"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Update the header section to replace the current app name (BlueChat) with 'XetaChat'. Locate the header element that displays the app name and change the text content to 'XetaChat'. Ensure this change applies to the header rendered in all views (both pairing and chat)."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Update the HTML title tag to display 'XetaChat' instead of 'BlueChat' for consistency with the in-app header, ensuring the browser tab title matches the new app name."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 9,
+  "summary": "A Bluetooth-based messaging app where two paired Bluetooth devices can send and receive messages to/from each other without requiring WiFi or mobile data.",
+  "architectural_notes": [
+    "Uses Bluetooth Classic (RFCOMM/SPP) or BLE for peer-to-peer communication — no internet, WiFi, or mobile data required",
+    "App must request Bluetooth and location permissions at runtime (Android) or core Bluetooth usage description (iOS)"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-a-bluetooth-device-discovery-and-pairing-flow-on-the-frontend-using-the-web-bluetooth-api-navigator-bluetooth-requestdevice-allow-the-user-to-scan-for-nearby-bluetooth-devices-select-one-to-pair-with-and-establish-a-gatt-connection-for-data-transfer",
+      "title": "Implement a Bluetooth device discovery and pairing flow on the frontend using the Web Bluetooth API (navigator.bluetooth.requestDevice). Allow the user to scan for nearby Bluetooth devices, select one to pair with, and establish a GATT connection for data transfer.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-a-real-time-connection-status-indicator-in-the-chat-ui-that-shows-whether-a-bluetooth-device-is-currently-connected-the-name-of-the-paired-device-and-a-disconnect-button",
+      "title": "Display a real-time connection status indicator in the chat UI that shows whether a Bluetooth device is currently connected, the name of the paired device, and a disconnect button.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-chat-interface-showing-the-full-conversation-between-the-two-connected-devices-messages-sent-by-the-local-user-appear-on-the-right-messages-received-from-the-paired-bluetooth-device-appear-on-the-left-each-message-bubble-must-display-sender-label-and-timestamp-include-a-text-input-field-and-a-send-button",
+      "title": "Build a chat interface showing the full conversation between the two connected devices. Messages sent by the local user appear on the right; messages received from the paired Bluetooth device appear on the left. Each message bubble must display sender label and timestamp. Include a text input field and a send button.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-clean-modern-dark-mode-visual-theme-with-a-deep-navy-charcoal-background-electric-cyan-accent-colors-rounded-message-bubbles-and-a-monospace-friendly-sans-serif-font-the-design-should-feel-technical-and-wireless-communication-inspired-enforce-this-style-consistently-across-all-screens",
+      "title": "Apply a clean, modern dark-mode visual theme with a deep navy/charcoal background, electric cyan accent colors, rounded message bubbles, and a monospace-friendly sans-serif font. The design should feel technical and wireless-communication-inspired. Enforce this style consistently across all screens.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-visible-styled-scrollbar-to-the-first-page-bluetoothpairing-view-so-that-all-content-is-accessible-when-the-viewport-height-is-insufficient-the-page-container-should-allow-vertical-scrolling-with-overflow-y-set-appropriately-ensuring-bottom-elements-such-as-buttons-and-status-indicators-are-reachable-by-scrolling",
+      "title": "Add a visible, styled scrollbar to the first page (BluetoothPairing view) so that all content is accessible when the viewport height is insufficient. The page container should allow vertical scrolling with overflow-y set appropriately, ensuring bottom elements such as buttons and status indicators are reachable by scrolling.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-footer-copyright-line-from-the-app-the-footer-element-or-the-copyright-text-within-it-rendered-in-app-tsx-should-be-deleted-so-it-no-longer-appears-on-any-screen",
+      "title": "Remove the footer copyright line from the app. The footer element (or the copyright text within it) rendered in App.tsx should be deleted so it no longer appears on any screen.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-app-header-top-bar-in-app-tsx-to-display-xetachat-as-the-app-name-replacing-any-previous-name-or-placeholder-text-currently-shown-there",
+      "title": "Update the app header/top bar in App.tsx to display 'XetaChat' as the app name, replacing any previous name or placeholder text currently shown there.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Bluetooth device discovery and pairing",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Send and receive text messages over Bluetooth connection",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Chat UI showing conversation between two connected devices",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Connection status indicator showing active Bluetooth link",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Implement a backend actor that stores chat messages with sender identity, message content, timestamp, and a session/conversation ID. Expose functions to: post a message, retrieve all messages for a conversation, and clear conversation history.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add scrollbar to the first/main page so bottom items are accessible",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Remove footer copyright line from the app",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Update the app's top bar/header to display 'XetaChat' instead of the old name",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "BlueChat",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

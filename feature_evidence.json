@@ -1,0 +1,23 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-the-app-header-top-bar-in-app-tsx-to-display-xetachat-as-the-app-name-replacing-any-previous-name-or-placeholder-text-currently-shown-there",
+      "featureTitle": "Update the app header/top bar in App.tsx to display 'XetaChat' as the app name, replacing any previous name or placeholder text currently shown there.",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
