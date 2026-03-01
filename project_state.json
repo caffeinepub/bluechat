@@ -1,13 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
-  "summary": "A Bluetooth-based messaging app where two paired Bluetooth devices can send and receive messages to/from each other without requiring WiFi or mobile data.",
+  "projectStateVersion": 19,
+  "summary": "A WhatsApp-like full-featured messaging app named 'Xeta' with real-time chat, user accounts, contacts, media sharing, and other core WhatsApp-style features. This replaces the previous Bluetooth-based messaging concept.",
   "architectural_notes": [
-    "Uses Bluetooth Classic (RFCOMM/SPP) or BLE for peer-to-peer communication — no internet, WiFi, or mobile data required",
-    "App must request Bluetooth and location permissions at runtime (Android) or core Bluetooth usage description (iOS)"
+    "Replacing Bluetooth-based architecture with internet-based real-time messaging using WebSockets or similar technology",
+    "Requires backend user authentication, message storage, and real-time event broadcasting"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "After sign-in, the next screen fails to load / takes too long, and the keyboard flickers (shows and hides repeatedly) during loading",
+    "Registration fails on the registration screen and the app does not navigate to the next screen after submitting registration"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-a-bluetooth-device-discovery-and-pairing-flow-on-the-frontend-using-the-web-bluetooth-api-navigator-bluetooth-requestdevice-allow-the-user-to-scan-for-nearby-bluetooth-devices-select-one-to-pair-with-and-establish-a-gatt-connection-for-data-transfer",
@@ -64,57 +67,207 @@
         "REQ-8"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-save-the-user-uploaded-logo-image-as-a-static-asset-at-frontend-public-assets-generated-xetachat-logo-png-and-display-it-in-the-app-header-top-bar-in-app-tsx-replacing-the-current-signal-bar-decoration-or-any-existing-logo-placeholder-the-logo-should-be-sized-appropriately-for-a-top-bar-approximately-32-40px-in-height-maintain-its-aspect-ratio-and-be-vertically-centered-alongside-the-xetachat-app-name-text",
+      "title": "Save the user-uploaded logo image as a static asset at 'frontend/public/assets/generated/xetachat-logo.png' and display it in the app header/top bar in App.tsx, replacing the current signal bar decoration or any existing logo placeholder. The logo should be sized appropriately for a top bar (approximately 32–40px in height), maintain its aspect ratio, and be vertically centered alongside the 'XetaChat' app name text.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-app-tsx-remove-any-bluetooth-messenger-subtitle-or-secondary-text-currently-displayed-in-the-top-bar-header-alongside-the-xetachat-logo-and-app-name-so-that-only-the-logo-and-the-xetachat-text-remain-in-the-header",
+      "title": "In App.tsx, remove any 'Bluetooth Messenger' subtitle or secondary text currently displayed in the top bar/header alongside the XetaChat logo and app name, so that only the logo and the 'XetaChat' text remain in the header.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-app-tsx-resize-the-xetachat-app-name-text-in-the-header-so-that-its-font-size-visually-matches-the-height-of-the-xetachat-logo-image-which-is-approximately-32-40px-tall-the-text-should-appear-the-same-height-as-the-logo-and-remain-vertically-centered-alongside-it",
+      "title": "In App.tsx, resize the 'XetaChat' app name text in the header so that its font size visually matches the height of the XetaChat logo image (which is approximately 32–40px tall). The text should appear the same height as the logo and remain vertically centered alongside it.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-user-registration-and-login-flow-on-first-launch-display-a-screen-where-the-user-enters-a-username-and-display-name-to-create-their-account-store-the-identity-tied-to-internet-identity-after-registration-direct-the-user-to-the-main-chat-screen-if-already-registered-skip-to-the-main-screen-automatically",
+      "title": "Implement a user registration and login flow. On first launch, display a screen where the user enters a username and display name to create their account. Store the identity tied to Internet Identity. After registration, direct the user to the main chat screen. If already registered, skip to the main screen automatically.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-contacts-screen-that-lists-all-registered-users-each-contact-entry-shows-the-user-s-avatar-or-initials-placeholder-display-name-username-and-online-last-seen-status-tapping-a-contact-opens-a-one-on-one-chat-with-that-user",
+      "title": "Build a contacts screen that lists all registered users. Each contact entry shows the user's avatar (or initials placeholder), display name, username, and online/last seen status. Tapping a contact opens a one-on-one chat with that user.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-one-on-one-chat-screen-for-messaging-between-two-users-messages-from-the-current-user-appear-on-the-right-in-a-colored-bubble-received-messages-appear-on-the-left-in-a-contrasting-bubble-each-bubble-shows-the-message-text-and-a-timestamp-a-text-input-field-and-send-button-are-present-at-the-bottom-sending-a-message-calls-sendmessage-on-the-backend-the-message-list-auto-scrolls-to-the-latest-message",
+      "title": "Build a one-on-one chat screen for messaging between two users. Messages from the current user appear on the right in a colored bubble; received messages appear on the left in a contrasting bubble. Each bubble shows the message text and a timestamp. A text input field and send button are present at the bottom. Sending a message calls sendMessage on the backend. The message list auto-scrolls to the latest message.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-message-delivery-and-read-receipt-indicators-to-each-message-bubble-in-the-chat-screen-show-a-single-tick-sent-double-tick-delivered-and-blue-colored-double-tick-read-icon-next-to-each-sent-message-reflecting-the-message-s-status-field-from-the-backend",
+      "title": "Add message delivery and read receipt indicators to each message bubble in the chat screen. Show a single tick (sent), double tick (delivered), and blue/colored double tick (read) icon next to each sent message, reflecting the message's status field from the backend.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-group-chat-creation-and-messaging-add-a-new-group-button-on-the-contacts-chats-screen-group-creation-flow-select-participants-from-contacts-set-a-group-name-group-chats-appear-in-the-chat-list-alongside-one-on-one-chats-inside-a-group-chat-all-messages-from-all-members-are-displayed-with-sender-names-shown-above-each-received-message-bubble",
+      "title": "Implement group chat creation and messaging. Add a 'New Group' button on the contacts/chats screen. Group creation flow: select participants from contacts, set a group name. Group chats appear in the chat list alongside one-on-one chats. Inside a group chat, all messages from all members are displayed with sender names shown above each received message bubble.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-user-profile-screen-accessible-from-the-main-navigation-display-the-user-s-avatar-with-ability-to-update-display-name-username-and-status-message-allow-editing-display-name-and-status-message-which-calls-updateprofile-on-the-backend-show-an-online-presence-indicator",
+      "title": "Add a user profile screen accessible from the main navigation. Display the user's avatar (with ability to update), display name, username, and status message. Allow editing display name and status message, which calls updateProfile on the backend. Show an 'Online' presence indicator.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-online-last-seen-presence-indicators-throughout-the-app-in-the-contacts-list-contact-header-in-chat-and-group-member-views-show-online-if-the-user-was-recently-active-or-last-seen-relative-time-otherwise-update-lastseen-on-the-backend-whenever-the-current-user-sends-a-message-or-opens-the-app",
+      "title": "Display online/last seen presence indicators throughout the app. In the contacts list, contact header in chat, and group member views, show 'Online' if the user was recently active or 'Last seen [relative time]' otherwise. Update lastSeen on the backend whenever the current user sends a message or opens the app.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-media-sharing-in-chat-allow-users-to-attach-and-send-images-and-files-by-tapping-a-paperclip-attachment-icon-in-the-chat-input-area-uploaded-media-should-be-stored-as-base64-encoded-content-or-url-references-in-the-message-payload-on-the-backend-received-image-messages-render-as-inline-image-previews-in-the-chat-bubble-file-messages-render-as-a-downloadable-file-link",
+      "title": "Implement media sharing in chat: allow users to attach and send images and files by tapping a paperclip/attachment icon in the chat input area. Uploaded media should be stored as base64-encoded content or URL references in the message payload on the backend. Received image messages render as inline image previews in the chat bubble; file messages render as a downloadable file link.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-entire-app-visual-theme-to-match-a-modern-whatsapp-inspired-aesthetic-for-xeta-use-a-dark-green-and-deep-charcoal-color-palette-replacing-the-existing-navy-cyan-bluetooth-theme-apply-a-clean-sans-serif-font-subtle-card-style-chat-list-rows-a-distinct-teal-green-accent-for-send-buttons-and-highlights-white-light-message-bubbles-for-received-and-accent-colored-bubbles-for-sent-messages-rename-all-user-visible-branding-from-xetachat-bluechat-to-xeta-update-index-html-title-to-xeta-apply-the-theme-consistently-across-all-screens-registration-contacts-chat-profile",
+      "title": "Redesign the entire app visual theme to match a modern WhatsApp-inspired aesthetic for 'Xeta'. Use a dark green and deep charcoal color palette (replacing the existing navy/cyan Bluetooth theme). Apply a clean sans-serif font, subtle card-style chat list rows, a distinct teal/green accent for send buttons and highlights, white/light message bubbles for received and accent-colored bubbles for sent messages. Rename all user-visible branding from 'XetaChat' / 'BlueChat' to 'Xeta'. Update index.html title to 'Xeta'. Apply the theme consistently across all screens: registration, contacts, chat, profile.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-main-chat-list-screen-home-screen-after-login-that-shows-all-active-one-on-one-and-group-conversations-each-row-displays-the-contact-group-avatar-or-initials-name-last-message-preview-text-and-timestamp-of-the-last-message-conversations-are-sorted-by-most-recent-activity-tapping-a-row-opens-the-corresponding-chat",
+      "title": "Build a main chat list screen (home screen after login) that shows all active one-on-one and group conversations. Each row displays the contact/group avatar or initials, name, last message preview text, and timestamp of the last message. Conversations are sorted by most recent activity. Tapping a row opens the corresponding chat.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-post-sign-in-navigation-flow-in-app-tsx-so-that-after-a-successful-internet-identity-login-the-app-immediately-transitions-to-the-appropriate-screen-registration-if-new-user-chat-list-if-already-registered-without-indefinite-loading-add-a-clear-loading-state-with-a-timeout-fallback-so-the-user-is-never-stuck-on-a-blank-or-perpetual-loading-screen",
+      "title": "Fix the post-sign-in navigation flow in App.tsx so that after a successful Internet Identity login, the app immediately transitions to the appropriate screen (registration if new user, chat-list if already registered) without indefinite loading. Add a clear loading state with a timeout/fallback so the user is never stuck on a blank or perpetual loading screen.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-eliminate-the-keyboard-virtual-keyboard-flickering-rapid-show-hide-cycles-that-occurs-during-the-loading-phase-after-sign-in-in-app-tsx-and-registrationscreen-tsx-ensure-that-no-input-element-receives-and-loses-focus-repeatedly-during-loading-transitions-and-that-auto-focus-on-input-fields-is-only-triggered-once-the-target-screen-has-fully-mounted-and-the-loading-state-is-resolved",
+      "title": "Eliminate the keyboard/virtual-keyboard flickering (rapid show/hide cycles) that occurs during the loading phase after sign-in in App.tsx and RegistrationScreen.tsx. Ensure that no input element receives and loses focus repeatedly during loading transitions, and that auto-focus on input fields is only triggered once the target screen has fully mounted and the loading state is resolved.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-registration-flow-in-registrationscreen-tsx-so-that-calling-createuser-on-the-backend-succeeds-without-errors-add-proper-error-handling-that-surfaces-a-readable-error-message-to-the-user-if-registration-fails-and-ensure-the-component-correctly-awaits-the-mutation-result-before-attempting-navigation",
+      "title": "Fix the registration flow in RegistrationScreen.tsx so that calling createUser on the backend succeeds without errors. Add proper error handling that surfaces a readable error message to the user if registration fails, and ensure the component correctly awaits the mutation result before attempting navigation.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-post-registration-navigation-in-app-tsx-so-that-after-a-successful-createuser-call-the-app-transitions-from-the-registration-screen-to-the-chat-list-screen-immediately-ensure-the-currentuser-profile-state-is-updated-before-the-navigation-check-runs-so-the-app-does-not-loop-back-to-registration-or-get-stuck-on-a-loading-screen",
+      "title": "Fix the post-registration navigation in App.tsx so that after a successful createUser call, the app transitions from the registration screen to the chat list screen immediately. Ensure the currentUser / profile state is updated before the navigation check runs, so the app does not loop back to registration or get stuck on a loading screen.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-1",
-      "summary": "Bluetooth device discovery and pairing",
+      "id": "AR-11",
+      "summary": "User registration and login (phone number or email based authentication)",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-2",
-      "summary": "Send and receive text messages over Bluetooth connection",
+      "id": "AR-12",
+      "summary": "Real-time one-on-one chat messaging between users",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-3",
-      "summary": "Chat UI showing conversation between two connected devices",
+      "id": "AR-13",
+      "summary": "Contacts list showing all registered users or saved contacts",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-4",
-      "summary": "Connection status indicator showing active Bluetooth link",
+      "id": "AR-14",
+      "summary": "Group chat creation and messaging",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-5",
-      "summary": "Implement a backend actor that stores chat messages with sender identity, message content, timestamp, and a session/conversation ID. Expose functions to: post a message, retrieve all messages for a conversation, and clear conversation history.",
+      "id": "AR-15",
+      "summary": "Message delivery and read receipts (sent, delivered, read indicators)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Media sharing — send and receive images, videos, and files in chat",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "User profile with avatar, display name, and status message",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Online/last seen presence indicators for contacts",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Rebuild the backend in backend/main.mo to support a WhatsApp-style messaging system. Replace the current Bluetooth/conversation model with: user accounts (username, display name, avatar URL, status message, last seen timestamp), contacts (per-user contact lists), one-on-one conversations keyed by a pair of user IDs, group chats (name, member list, admin), messages (sender, content, timestamp, delivery status: sent/delivered/read), and media attachments (image/file URL references). Expose stable Motoko upgrade-safe data structures using HashMap with stable var backup arrays.",
       "reqIds": [
-        "REQ-1"
+        "REQ-12"
       ],
       "status": "pending"
     },
     {
-      "id": "AR-6",
-      "summary": "Add scrollbar to the first/main page so bottom items are accessible",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Remove footer copyright line from the app",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Update the app's top bar/header to display 'XetaChat' instead of the old name",
-      "reqIds": [],
+      "id": "AR-22",
+      "summary": "Audit and fix the backend createUser function in backend/main.mo to ensure it correctly handles duplicate username and principal checks, returns a clear error variant when registration fails, and persists the new user record reliably so subsequent getMyProfile calls return the newly created profile.",
+      "reqIds": [
+        "REQ-27"
+      ],
       "status": "pending"
     }
   ],

@@ -2,8 +2,29 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-app-header-top-bar-in-app-tsx-to-display-xetachat-as-the-app-name-replacing-any-previous-name-or-placeholder-text-currently-shown-there",
-      "featureTitle": "Update the app header/top bar in App.tsx to display 'XetaChat' as the app name, replacing any previous name or placeholder text currently shown there.",
+      "featureId": "feature-fix-the-registration-flow-in-registrationscreen-tsx-so-that-calling-createuser-on-the-backend-succeeds-without-errors-add-proper-error-handling-that-surfaces-a-readable-error-message-to-the-user-if-registration-fails-and-ensure-the-component-correctly-awaits-the-mutation-result-before-attempting-navigation",
+      "featureTitle": "Fix the registration flow in RegistrationScreen.tsx so that calling createUser on the backend succeeds without errors. Add proper error handling that surfaces a readable error message to the user if registration fails, and ensure the component correctly awaits the mutation result before attempting navigation.",
+      "files": [
+        "frontend/src/components/RegistrationScreen.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-25"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-post-registration-navigation-in-app-tsx-so-that-after-a-successful-createuser-call-the-app-transitions-from-the-registration-screen-to-the-chat-list-screen-immediately-ensure-the-currentuser-profile-state-is-updated-before-the-navigation-check-runs-so-the-app-does-not-loop-back-to-registration-or-get-stuck-on-a-loading-screen",
+      "featureTitle": "Fix the post-registration navigation in App.tsx so that after a successful createUser call, the app transitions from the registration screen to the chat list screen immediately. Ensure the currentUser / profile state is updated before the navigation check runs, so the app does not loop back to registration or get stuck on a loading screen.",
       "files": [
         "frontend/src/App.tsx"
       ],
@@ -12,10 +33,12 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-8"
+        "REQ-26"
       ],
       "confidence": "high"
     }

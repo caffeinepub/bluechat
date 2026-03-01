@@ -1,26 +1,45 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update app name to XetaChat in top bar",
+  "title": "Fix registration failure and post-registration navigation",
   "requirements": [
     {
-      "id": "REQ-8",
-      "summary": "Update the app header/top bar to display 'XetaChat' as the app name",
+      "id": "REQ-25",
+      "summary": "Fix the registration flow in RegistrationScreen.tsx to ensure createUser succeeds, add proper error handling, and await mutation result before navigation",
       "acceptanceCriteria": [
-        "The top bar/header visibly displays 'XetaChat' as the app name on all screens",
-        "No previous app name or placeholder text remains in the header",
-        "The change is consistent across both the pairing view and the chat view"
+        "Submitting a valid display name and username on the registration screen calls createUser on the backend without throwing an unhandled error.",
+        "If createUser returns an error variant or throws, a readable error message is displayed inline on the registration form.",
+        "If createUser succeeds, the app immediately navigates to the chat list screen without delay.",
+        "The registration button is disabled while the mutation is in-flight to prevent double submission.",
+        "No console errors related to undefined actor, missing principal, or unhandled promise rejection appear during registration."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/RegistrationScreen.tsx",
+          "operation": "modify",
+          "description": "Fix the registration flow to properly await the createUser mutation result before attempting navigation. Add error handling that checks if the mutation result is an error variant (#authenticationError) and displays a readable error message inline on the form. Ensure the submit button is disabled while the mutation is in-flight (isPending state). Handle the success case by checking for the #userProfile variant before triggering navigation. Add a local error state to store and display backend error messages."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Review and update the createUser mutation hook to ensure it properly handles the CreateUserResult discriminated union type returned by the backend. The mutation should not throw on error variants; instead, it should return the raw result so the component can inspect whether it's #authenticationError or #userProfile. Ensure the mutation invalidates the 'currentUserProfile' query key on success to trigger profile refetch."
+        }
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "summary": "Fix post-registration navigation in App.tsx to transition from registration to chat list immediately after successful createUser",
+      "acceptanceCriteria": [
+        "After successful registration, the app displays the chat list screen without requiring a manual page refresh.",
+        "The app does not re-render back to the registration screen after a successful createUser call.",
+        "The app does not show an indefinite loading spinner after registration completes.",
+        "The user's newly created profile is available in app state immediately after navigation to the chat list screen."
       ],
       "file_operations": [
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Update the header section to replace the current app name (BlueChat) with 'XetaChat'. Locate the header element that displays the app name and change the text content to 'XetaChat'. Ensure this change applies to the header rendered in all views (both pairing and chat)."
-        },
-        {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Update the HTML title tag to display 'XetaChat' instead of 'BlueChat' for consistency with the in-app header, ensuring the browser tab title matches the new app name."
+          "description": "Fix the navigation logic to ensure that after a successful createUser call, the currentUser state is updated before the component re-renders. Review the profile loading flow and ensure the 15-second timeout/retry fallback does not interfere with immediate post-registration navigation. Ensure that when the profile query refetches after registration (triggered by query invalidation), the loading and screen-selection logic correctly transitions to the chat list screen without looping back to registration or showing an indefinite spinner. Consider adding a query refetch trigger or ensuring the profile query is marked as stale after registration completes."
         }
       ]
     }

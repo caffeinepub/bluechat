@@ -10,17 +10,105 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Message {
-  'content' : string,
-  'sender' : Principal,
-  'conversationId' : string,
+export type ConversationType = { 'group' : null } |
+  { 'oneOnOne' : null };
+export interface ConversationView {
+  'id' : string,
+  'participants' : Array<string>,
+  'messages' : Array<Message>,
+  'name' : string,
+  'admins' : [] | [Array<string>],
   'timestamp' : Time,
+  'conversationType' : ConversationType,
 }
+export type CreateUserResult = { 'authenticationError' : string } |
+  { 'userProfile' : UserProfile };
+export type ExternalBlob = Uint8Array;
+export type FileType = { 'video' : null } |
+  { 'document' : null } |
+  { 'image' : null };
+export interface MediaFile { 'media' : ExternalBlob, 'fileType' : FileType }
+export interface Message {
+  'id' : string,
+  'status' : MessageStatus,
+  'content' : string,
+  'deliveryTime' : [] | [Time],
+  'readTime' : [] | [Time],
+  'messageType' : MessageType,
+  'conversationId' : string,
+  'mediaFile' : [] | [MediaFile],
+  'timestamp' : Time,
+  'senderId' : string,
+}
+export type MessageStatus = { 'read' : null } |
+  { 'sent' : null } |
+  { 'delivered' : null };
+export type MessageType = { 'file' : null } |
+  { 'text' : null } |
+  { 'image' : null };
 export type Time = bigint;
+export type UserId = string;
+export interface UserProfile {
+  'id' : string,
+  'username' : string,
+  'displayName' : string,
+  'avatarUrl' : [] | [string],
+  'statusMessage' : [] | [string],
+  'lastSeen' : Time,
+}
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
-  'clearConversation' : ActorMethod<[string], undefined>,
-  'getMessages' : ActorMethod<[string], Array<Message>>,
-  'postMessage' : ActorMethod<[string, string], undefined>,
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'adminAssignRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createGroupChat' : ActorMethod<[Array<UserId>, string], ConversationView>,
+  'createOneOnOneConversation' : ActorMethod<[UserId], ConversationView>,
+  'createUser' : ActorMethod<[string, string], CreateUserResult>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getContactById' : ActorMethod<[string], [] | [UserProfile]>,
+  'getConversation' : ActorMethod<[string], [] | [ConversationView]>,
+  'getMessages' : ActorMethod<[string, bigint, bigint], Array<Message>>,
+  'getMyConversations' : ActorMethod<[], Array<ConversationView>>,
+  'getUserProfile' : ActorMethod<[string], [] | [UserProfile]>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
+  'markMessageAsDelivered' : ActorMethod<[string, string], undefined>,
+  'markMessageAsRead' : ActorMethod<[string, string], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'sendMessage' : ActorMethod<
+    [string, string, MessageType, [] | [MediaFile]],
+    Message
+  >,
+  'updateLastSeen' : ActorMethod<[], undefined>,
+  'uploadMedia' : ActorMethod<[ExternalBlob], ExternalBlob>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

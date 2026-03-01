@@ -89,62 +89,834 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface Message {
-    content: string;
-    sender: Principal;
-    conversationId: string;
-    timestamp: Time;
+export interface _CaffeineStorageRefillResult {
+    success?: boolean;
+    topped_up_amount?: bigint;
+}
+export interface MediaFile {
+    media: ExternalBlob;
+    fileType: FileType;
 }
 export type Time = bigint;
-export interface backendInterface {
-    clearConversation(conversationId: string): Promise<void>;
-    getMessages(conversationId: string): Promise<Array<Message>>;
-    postMessage(conversationId: string, content: string): Promise<void>;
+export interface _CaffeineStorageRefillInformation {
+    proposed_top_up_amount?: bigint;
 }
+export interface ConversationView {
+    id: string;
+    participants: Array<string>;
+    messages: Array<Message>;
+    name: string;
+    admins?: Array<string>;
+    timestamp: Time;
+    conversationType: ConversationType;
+}
+export interface _CaffeineStorageCreateCertificateResult {
+    method: string;
+    blob_hash: string;
+}
+export type UserId = string;
+export type CreateUserResult = {
+    __kind__: "authenticationError";
+    authenticationError: string;
+} | {
+    __kind__: "userProfile";
+    userProfile: UserProfile;
+};
+export interface Message {
+    id: string;
+    status: MessageStatus;
+    content: string;
+    deliveryTime?: Time;
+    readTime?: Time;
+    messageType: MessageType;
+    conversationId: string;
+    mediaFile?: MediaFile;
+    timestamp: Time;
+    senderId: string;
+}
+export interface UserProfile {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl?: string;
+    statusMessage?: string;
+    lastSeen: Time;
+}
+export enum ConversationType {
+    group = "group",
+    oneOnOne = "oneOnOne"
+}
+export enum FileType {
+    video = "video",
+    document_ = "document",
+    image = "image"
+}
+export enum MessageStatus {
+    read = "read",
+    sent = "sent",
+    delivered = "delivered"
+}
+export enum MessageType {
+    file = "file",
+    text = "text",
+    image = "image"
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
+}
+export interface backendInterface {
+    _caffeineStorageBlobIsLive(hash: Uint8Array): Promise<boolean>;
+    _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>>;
+    _caffeineStorageConfirmBlobDeletion(blobs: Array<Uint8Array>): Promise<void>;
+    _caffeineStorageCreateCertificate(blobHash: string): Promise<_CaffeineStorageCreateCertificateResult>;
+    _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
+    _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
+    _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    adminAssignRole(user: Principal, role: UserRole): Promise<void>;
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    createGroupChat(participants: Array<UserId>, groupName: string): Promise<ConversationView>;
+    createOneOnOneConversation(otherUserId: UserId): Promise<ConversationView>;
+    createUser(username: string, displayName: string): Promise<CreateUserResult>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
+    getCallerUserRole(): Promise<UserRole>;
+    getContactById(userId: string): Promise<UserProfile | null>;
+    getConversation(conversationId: string): Promise<ConversationView | null>;
+    getMessages(conversationId: string, startIdx: bigint, count: bigint): Promise<Array<Message>>;
+    getMyConversations(): Promise<Array<ConversationView>>;
+    getUserProfile(userId: string): Promise<UserProfile | null>;
+    isCallerAdmin(): Promise<boolean>;
+    markMessageAsDelivered(conversationId: string, messageId: string): Promise<void>;
+    markMessageAsRead(conversationId: string, messageId: string): Promise<void>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    sendMessage(conversationId: string, content: string, messageType: MessageType, mediaFile: MediaFile | null): Promise<Message>;
+    updateLastSeen(): Promise<void>;
+    uploadMedia(blob: ExternalBlob): Promise<ExternalBlob>;
+}
+import type { ConversationType as _ConversationType, ConversationView as _ConversationView, CreateUserResult as _CreateUserResult, ExternalBlob as _ExternalBlob, FileType as _FileType, MediaFile as _MediaFile, Message as _Message, MessageStatus as _MessageStatus, MessageType as _MessageType, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async clearConversation(arg0: string): Promise<void> {
+    async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.clearConversation(arg0);
+                const result = await this.actor._caffeineStorageBlobIsLive(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.clearConversation(arg0);
+            const result = await this.actor._caffeineStorageBlobIsLive(arg0);
             return result;
         }
     }
-    async getMessages(arg0: string): Promise<Array<Message>> {
+    async _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getMessages(arg0);
+                const result = await this.actor._caffeineStorageBlobsToDelete();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getMessages(arg0);
+            const result = await this.actor._caffeineStorageBlobsToDelete();
             return result;
         }
     }
-    async postMessage(arg0: string, arg1: string): Promise<void> {
+    async _caffeineStorageConfirmBlobDeletion(arg0: Array<Uint8Array>): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.postMessage(arg0, arg1);
+                const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.postMessage(arg0, arg1);
+            const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
             return result;
         }
     }
+    async _caffeineStorageCreateCertificate(arg0: string): Promise<_CaffeineStorageCreateCertificateResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageRefillCashier(arg0: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+                return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+            return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async _caffeineStorageUpdateGatewayPrincipals(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+            return result;
+        }
+    }
+    async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._initializeAccessControlWithSecret(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._initializeAccessControlWithSecret(arg0);
+            return result;
+        }
+    }
+    async adminAssignRole(arg0: Principal, arg1: UserRole): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminAssignRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminAssignRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async createGroupChat(arg0: Array<UserId>, arg1: string): Promise<ConversationView> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createGroupChat(arg0, arg1);
+                return from_candid_ConversationView_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createGroupChat(arg0, arg1);
+            return from_candid_ConversationView_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async createOneOnOneConversation(arg0: UserId): Promise<ConversationView> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createOneOnOneConversation(arg0);
+                return from_candid_ConversationView_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createOneOnOneConversation(arg0);
+            return from_candid_ConversationView_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async createUser(arg0: string, arg1: string): Promise<CreateUserResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createUser(arg0, arg1);
+                return from_candid_CreateUserResult_n29(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createUser(arg0, arg1);
+            return from_candid_CreateUserResult_n29(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getCallerUserProfile(): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserProfile();
+                return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserProfile();
+            return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getCallerUserRole(): Promise<UserRole> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserRole();
+                return from_candid_UserRole_n35(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserRole();
+            return from_candid_UserRole_n35(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getContactById(arg0: string): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getContactById(arg0);
+                return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getContactById(arg0);
+            return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getConversation(arg0: string): Promise<ConversationView | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getConversation(arg0);
+                return from_candid_opt_n37(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getConversation(arg0);
+            return from_candid_opt_n37(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getMessages(arg0: string, arg1: bigint, arg2: bigint): Promise<Array<Message>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMessages(arg0, arg1, arg2);
+                return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMessages(arg0, arg1, arg2);
+            return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getMyConversations(): Promise<Array<ConversationView>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMyConversations();
+                return from_candid_vec_n38(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMyConversations();
+            return from_candid_vec_n38(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getUserProfile(arg0: string): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserProfile(arg0);
+                return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserProfile(arg0);
+            return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isCallerAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isCallerAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async markMessageAsDelivered(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.markMessageAsDelivered(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.markMessageAsDelivered(arg0, arg1);
+            return result;
+        }
+    }
+    async markMessageAsRead(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.markMessageAsRead(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.markMessageAsRead(arg0, arg1);
+            return result;
+        }
+    }
+    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n39(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n39(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async sendMessage(arg0: string, arg1: string, arg2: MessageType, arg3: MediaFile | null): Promise<Message> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.sendMessage(arg0, arg1, to_candid_MessageType_n41(this._uploadFile, this._downloadFile, arg2), await to_candid_opt_n43(this._uploadFile, this._downloadFile, arg3));
+                return from_candid_Message_n13(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.sendMessage(arg0, arg1, to_candid_MessageType_n41(this._uploadFile, this._downloadFile, arg2), await to_candid_opt_n43(this._uploadFile, this._downloadFile, arg3));
+            return from_candid_Message_n13(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async updateLastSeen(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateLastSeen();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateLastSeen();
+            return result;
+        }
+    }
+    async uploadMedia(arg0: ExternalBlob): Promise<ExternalBlob> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.uploadMedia(await to_candid_ExternalBlob_n46(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_ExternalBlob_n23(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.uploadMedia(await to_candid_ExternalBlob_n46(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_ExternalBlob_n23(this._uploadFile, this._downloadFile, result);
+        }
+    }
+}
+function from_candid_ConversationType_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ConversationType): ConversationType {
+    return from_candid_variant_n28(_uploadFile, _downloadFile, value);
+}
+async function from_candid_ConversationView_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ConversationView): Promise<ConversationView> {
+    return await from_candid_record_n11(_uploadFile, _downloadFile, value);
+}
+function from_candid_CreateUserResult_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CreateUserResult): CreateUserResult {
+    return from_candid_variant_n30(_uploadFile, _downloadFile, value);
+}
+async function from_candid_ExternalBlob_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
+    return await _downloadFile(value);
+}
+function from_candid_FileType_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FileType): FileType {
+    return from_candid_variant_n25(_uploadFile, _downloadFile, value);
+}
+async function from_candid_MediaFile_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _MediaFile): Promise<MediaFile> {
+    return await from_candid_record_n22(_uploadFile, _downloadFile, value);
+}
+function from_candid_MessageStatus_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _MessageStatus): MessageStatus {
+    return from_candid_variant_n16(_uploadFile, _downloadFile, value);
+}
+function from_candid_MessageType_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _MessageType): MessageType {
+    return from_candid_variant_n19(_uploadFile, _downloadFile, value);
+}
+async function from_candid_Message_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Message): Promise<Message> {
+    return await from_candid_record_n14(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserProfile_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserProfile): UserProfile {
+    return from_candid_record_n32(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n36(_uploadFile, _downloadFile, value);
+}
+function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Time]): Time | null {
+    return value.length === 0 ? null : value[0];
+}
+async function from_candid_opt_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_MediaFile]): Promise<MediaFile | null> {
+    return value.length === 0 ? null : await from_candid_MediaFile_n21(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Array<string>]): Array<string> | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+    return value.length === 0 ? null : from_candid_UserProfile_n31(_uploadFile, _downloadFile, value[0]);
+}
+async function from_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ConversationView]): Promise<ConversationView | null> {
+    return value.length === 0 ? null : await from_candid_ConversationView_n10(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+async function from_candid_record_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    participants: Array<string>;
+    messages: Array<_Message>;
+    name: string;
+    admins: [] | [Array<string>];
+    timestamp: _Time;
+    conversationType: _ConversationType;
+}): Promise<{
+    id: string;
+    participants: Array<string>;
+    messages: Array<Message>;
+    name: string;
+    admins?: Array<string>;
+    timestamp: Time;
+    conversationType: ConversationType;
+}> {
+    return {
+        id: value.id,
+        participants: value.participants,
+        messages: await from_candid_vec_n12(_uploadFile, _downloadFile, value.messages),
+        name: value.name,
+        admins: record_opt_to_undefined(from_candid_opt_n26(_uploadFile, _downloadFile, value.admins)),
+        timestamp: value.timestamp,
+        conversationType: from_candid_ConversationType_n27(_uploadFile, _downloadFile, value.conversationType)
+    };
+}
+async function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    status: _MessageStatus;
+    content: string;
+    deliveryTime: [] | [_Time];
+    readTime: [] | [_Time];
+    messageType: _MessageType;
+    conversationId: string;
+    mediaFile: [] | [_MediaFile];
+    timestamp: _Time;
+    senderId: string;
+}): Promise<{
+    id: string;
+    status: MessageStatus;
+    content: string;
+    deliveryTime?: Time;
+    readTime?: Time;
+    messageType: MessageType;
+    conversationId: string;
+    mediaFile?: MediaFile;
+    timestamp: Time;
+    senderId: string;
+}> {
+    return {
+        id: value.id,
+        status: from_candid_MessageStatus_n15(_uploadFile, _downloadFile, value.status),
+        content: value.content,
+        deliveryTime: record_opt_to_undefined(from_candid_opt_n17(_uploadFile, _downloadFile, value.deliveryTime)),
+        readTime: record_opt_to_undefined(from_candid_opt_n17(_uploadFile, _downloadFile, value.readTime)),
+        messageType: from_candid_MessageType_n18(_uploadFile, _downloadFile, value.messageType),
+        conversationId: value.conversationId,
+        mediaFile: record_opt_to_undefined(await from_candid_opt_n20(_uploadFile, _downloadFile, value.mediaFile)),
+        timestamp: value.timestamp,
+        senderId: value.senderId
+    };
+}
+async function from_candid_record_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    media: _ExternalBlob;
+    fileType: _FileType;
+}): Promise<{
+    media: ExternalBlob;
+    fileType: FileType;
+}> {
+    return {
+        media: await from_candid_ExternalBlob_n23(_uploadFile, _downloadFile, value.media),
+        fileType: from_candid_FileType_n24(_uploadFile, _downloadFile, value.fileType)
+    };
+}
+function from_candid_record_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl: [] | [string];
+    statusMessage: [] | [string];
+    lastSeen: _Time;
+}): {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl?: string;
+    statusMessage?: string;
+    lastSeen: Time;
+} {
+    return {
+        id: value.id,
+        username: value.username,
+        displayName: value.displayName,
+        avatarUrl: record_opt_to_undefined(from_candid_opt_n33(_uploadFile, _downloadFile, value.avatarUrl)),
+        statusMessage: record_opt_to_undefined(from_candid_opt_n33(_uploadFile, _downloadFile, value.statusMessage)),
+        lastSeen: value.lastSeen
+    };
+}
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    success: [] | [boolean];
+    topped_up_amount: [] | [bigint];
+}): {
+    success?: boolean;
+    topped_up_amount?: bigint;
+} {
+    return {
+        success: record_opt_to_undefined(from_candid_opt_n6(_uploadFile, _downloadFile, value.success)),
+        topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
+    };
+}
+function from_candid_variant_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    read: null;
+} | {
+    sent: null;
+} | {
+    delivered: null;
+}): MessageStatus {
+    return "read" in value ? MessageStatus.read : "sent" in value ? MessageStatus.sent : "delivered" in value ? MessageStatus.delivered : value;
+}
+function from_candid_variant_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    file: null;
+} | {
+    text: null;
+} | {
+    image: null;
+}): MessageType {
+    return "file" in value ? MessageType.file : "text" in value ? MessageType.text : "image" in value ? MessageType.image : value;
+}
+function from_candid_variant_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    video: null;
+} | {
+    document: null;
+} | {
+    image: null;
+}): FileType {
+    return "video" in value ? FileType.video : "document" in value ? FileType.document : "image" in value ? FileType.image : value;
+}
+function from_candid_variant_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    group: null;
+} | {
+    oneOnOne: null;
+}): ConversationType {
+    return "group" in value ? ConversationType.group : "oneOnOne" in value ? ConversationType.oneOnOne : value;
+}
+function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    authenticationError: string;
+} | {
+    userProfile: _UserProfile;
+}): {
+    __kind__: "authenticationError";
+    authenticationError: string;
+} | {
+    __kind__: "userProfile";
+    userProfile: UserProfile;
+} {
+    return "authenticationError" in value ? {
+        __kind__: "authenticationError",
+        authenticationError: value.authenticationError
+    } : "userProfile" in value ? {
+        __kind__: "userProfile",
+        userProfile: from_candid_UserProfile_n31(_uploadFile, _downloadFile, value.userProfile)
+    } : value;
+}
+function from_candid_variant_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+}): UserRole {
+    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+}
+async function from_candid_vec_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Message>): Promise<Array<Message>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_Message_n13(_uploadFile, _downloadFile, x)));
+}
+async function from_candid_vec_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ConversationView>): Promise<Array<ConversationView>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_ConversationView_n10(_uploadFile, _downloadFile, x)));
+}
+async function to_candid_ExternalBlob_n46(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+    return await _uploadFile(value);
+}
+function to_candid_FileType_n47(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: FileType): _FileType {
+    return to_candid_variant_n48(_uploadFile, _downloadFile, value);
+}
+async function to_candid_MediaFile_n44(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: MediaFile): Promise<_MediaFile> {
+    return await to_candid_record_n45(_uploadFile, _downloadFile, value);
+}
+function to_candid_MessageType_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: MessageType): _MessageType {
+    return to_candid_variant_n42(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserProfile_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
+    return to_candid_record_n40(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n9(_uploadFile, _downloadFile, value);
+}
+function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
+    return to_candid_record_n3(_uploadFile, _downloadFile, value);
+}
+function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
+    return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
+}
+async function to_candid_opt_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: MediaFile | null): Promise<[] | [_MediaFile]> {
+    return value === null ? candid_none() : candid_some(await to_candid_MediaFile_n44(_uploadFile, _downloadFile, value));
+}
+function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    proposed_top_up_amount?: bigint;
+}): {
+    proposed_top_up_amount: [] | [bigint];
+} {
+    return {
+        proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
+    };
+}
+function to_candid_record_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl?: string;
+    statusMessage?: string;
+    lastSeen: Time;
+}): {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl: [] | [string];
+    statusMessage: [] | [string];
+    lastSeen: _Time;
+} {
+    return {
+        id: value.id,
+        username: value.username,
+        displayName: value.displayName,
+        avatarUrl: value.avatarUrl ? candid_some(value.avatarUrl) : candid_none(),
+        statusMessage: value.statusMessage ? candid_some(value.statusMessage) : candid_none(),
+        lastSeen: value.lastSeen
+    };
+}
+async function to_candid_record_n45(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    media: ExternalBlob;
+    fileType: FileType;
+}): Promise<{
+    media: _ExternalBlob;
+    fileType: _FileType;
+}> {
+    return {
+        media: await to_candid_ExternalBlob_n46(_uploadFile, _downloadFile, value.media),
+        fileType: to_candid_FileType_n47(_uploadFile, _downloadFile, value.fileType)
+    };
+}
+function to_candid_variant_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: MessageType): {
+    file: null;
+} | {
+    text: null;
+} | {
+    image: null;
+} {
+    return value == MessageType.file ? {
+        file: null
+    } : value == MessageType.text ? {
+        text: null
+    } : value == MessageType.image ? {
+        image: null
+    } : value;
+}
+function to_candid_variant_n48(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: FileType): {
+    video: null;
+} | {
+    document: null;
+} | {
+    image: null;
+} {
+    return value == FileType.video ? {
+        video: null
+    } : value == FileType.document ? {
+        document_: null
+    } : value == FileType.image ? {
+        image: null
+    } : value;
+}
+function to_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+} {
+    return value == UserRole.admin ? {
+        admin: null
+    } : value == UserRole.user ? {
+        user: null
+    } : value == UserRole.guest ? {
+        guest: null
+    } : value;
 }
 export interface CreateActorOptions {
     agent?: Agent;

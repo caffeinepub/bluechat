@@ -17,7 +17,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Inter', 'system-ui', 'sans-serif'],
-                mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+                display: ['Nunito', 'system-ui', 'sans-serif'],
             },
             colors: {
                 border: 'oklch(var(--border))',
@@ -70,32 +70,28 @@ export default {
                     border: 'oklch(var(--sidebar-border))',
                     ring: 'oklch(var(--sidebar-ring))'
                 },
-                navy: {
-                    deep: 'oklch(0.12 0.025 240)',
-                    mid: 'oklch(0.18 0.02 240)',
-                    surface: 'oklch(0.22 0.025 240)',
-                    elevated: 'oklch(0.28 0.03 240)',
-                    border: 'oklch(0.32 0.04 240)',
-                },
-                cyan: {
-                    glow: 'oklch(0.78 0.18 195)',
-                    dim: 'oklch(0.65 0.14 195)',
-                    bright: 'oklch(0.88 0.2 195)',
-                    muted: 'oklch(0.45 0.08 195)',
+                xeta: {
+                    green: 'oklch(0.72 0.17 155)',
+                    'green-bright': 'oklch(0.82 0.19 155)',
+                    'green-dim': 'oklch(0.55 0.13 155)',
+                    panel: 'oklch(0.12 0.01 200)',
+                    surface: 'oklch(0.18 0.015 200)',
+                    elevated: 'oklch(0.22 0.015 200)',
+                    border: 'oklch(0.28 0.02 200)',
                 },
             },
             borderRadius: {
                 lg: 'var(--radius)',
                 md: 'calc(var(--radius) - 2px)',
                 sm: 'calc(var(--radius) - 4px)',
-                bubble: '1.25rem',
-                'bubble-sm': '0.75rem',
+                bubble: '1.125rem',
+                'bubble-sm': '0.375rem',
             },
             boxShadow: {
                 xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                'cyan-glow': '0 0 20px oklch(0.78 0.18 195 / 0.3), 0 0 40px oklch(0.78 0.18 195 / 0.1)',
-                'cyan-glow-sm': '0 0 8px oklch(0.78 0.18 195 / 0.4)',
-                'card-dark': '0 4px 24px rgba(0,0,0,0.4)',
+                'green-glow': '0 0 16px oklch(0.72 0.17 155 / 0.25)',
+                'green-glow-sm': '0 0 6px oklch(0.72 0.17 155 / 0.35)',
+                'card-dark': '0 4px 24px rgba(0,0,0,0.5)',
             },
             keyframes: {
                 'accordion-down': {
@@ -107,18 +103,18 @@ export default {
                     to: { height: '0' }
                 },
                 'fade-in-up': {
-                    from: { opacity: '0', transform: 'translateY(8px)' },
+                    from: { opacity: '0', transform: 'translateY(6px)' },
                     to: { opacity: '1', transform: 'translateY(0)' }
                 },
                 'slide-in': {
-                    from: { opacity: '0', transform: 'translateX(-10px)' },
+                    from: { opacity: '0', transform: 'translateX(-8px)' },
                     to: { opacity: '1', transform: 'translateX(0)' }
                 },
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
-                'fade-in-up': 'fade-in-up 0.3s ease-out',
+                'fade-in-up': 'fade-in-up 0.2s ease-out',
                 'slide-in': 'slide-in 0.2s ease-out',
             }
         }
