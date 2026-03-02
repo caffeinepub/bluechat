@@ -82,6 +82,7 @@ export const UserProfile = IDL.Record({
 export const CreateUserResult = IDL.Variant({
   'authenticationError' : IDL.Text,
   'userProfile' : UserProfile,
+  'usernameTaken' : IDL.Text,
 });
 
 export const idlService = IDL.Service({
@@ -223,6 +224,7 @@ export const idlFactory = ({ IDL }) => {
   const CreateUserResult = IDL.Variant({
     'authenticationError' : IDL.Text,
     'userProfile' : UserProfile,
+    'usernameTaken' : IDL.Text,
   });
   
   return IDL.Service({

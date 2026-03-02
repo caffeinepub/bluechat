@@ -1,7 +1,7 @@
 import React from 'react';
 import { Circle } from 'lucide-react';
 
-export function UpdatesScreen() {
+export default function UpdatesScreen() {
     return (
         <div className="flex flex-col h-full bg-background">
             {/* Header */}

@@ -1,38 +1,68 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowLeft, Send, Paperclip, Loader2, Users } from 'lucide-react';
+import { ArrowLeft, Send, Paperclip, Loader2, Users, Phone, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { MessageBubble } from './MessageBubble';
 import { UserAvatar } from './UserAvatar';
 import { PresenceIndicator } from './PresenceIndicator';
-import { useGetMessages, useSendMessage, useGetContactById, useGetCallerUserProfile, useMarkMessageAsDelivered } from '../hooks/useQueries';
+import {
+    useGetMessages,
+    useSendMessage,
+    useGetContactById,
+    useGetCallerUserProfile,
+    useMarkMessageAsDelivered,
+} from '../hooks/useQueries';
 import { MessageType, FileType, ConversationType } from '../backend';
-import type { ConversationView } from '../backend';
+import type { ConversationView, UserProfile } from '../backend';
 import { ExternalBlob } from '../backend';
+import VoiceCallOverlay from './VoiceCallOverlay';
+import VideoCallOverlay from './VideoCallOverlay';
 
 interface ChatScreenProps {
-    conversation: ConversationView;
+    conversationId: string;
     currentUserId: string;
+    otherUser?: UserProfile;
+    groupName?: string;
     onBack: () => void;
+    // Legacy prop — kept for backward compat when called with full conversation object
+    conversation?: ConversationView;
 }
 
-export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenProps) {
+export default function ChatScreen({
+    conversationId,
+    currentUserId,
+    otherUser: otherUserProp,
+    groupName,
+    onBack,
+    conversation,
+}: ChatScreenProps) {
     const [inputValue, setInputValue] = useState('');
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+    const [showVoiceCall, setShowVoiceCall] = useState(false);
+    const [showVideoCall, setShowVideoCall] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const isGroup = conversation.conversationType === ConversationType.group;
-    const otherUserId = isGroup
-        ? null
-        : conversation.participants.find(p => p !== currentUserId) ?? null;
+    // Resolve conversation details — prefer explicit props, fall back to conversation object
+    const resolvedConvId = conversationId ?? conversation?.id ?? '';
+    const isGroup = conversation
+        ? conversation.conversationType === ConversationType.group
+        : !otherUserProp && !!groupName;
 
-    const { data: messages = [], isLoading: messagesLoading } = useGetMessages(conversation.id);
-    const { data: otherUser } = useGetContactById(otherUserId);
+    const otherUserId = otherUserProp
+        ? otherUserProp.id
+        : conversation && !isGroup
+        ? conversation.participants.find(p => p !== currentUserId) ?? null
+        : null;
+
+    const { data: messages = [], isLoading: messagesLoading } = useGetMessages(resolvedConvId);
+    const { data: fetchedOtherUser } = useGetContactById(otherUserProp ? null : otherUserId);
     const { data: currentProfile } = useGetCallerUserProfile();
-    const sendMessage = useSendMessage(conversation.id);
+    const sendMessage = useSendMessage(resolvedConvId);
     const markDelivered = useMarkMessageAsDelivered();
+
+    // Resolve the other user — prefer explicit prop, fall back to fetched
+    const otherUser = otherUserProp ?? fetchedOtherUser ?? null;
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -45,10 +75,10 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
     useEffect(() => {
         messages.forEach(msg => {
             if (msg.senderId !== currentUserId && msg.status === 'sent' as unknown) {
-                markDelivered.mutate({ conversationId: conversation.id, messageId: msg.id });
+                markDelivered.mutate({ conversationId: resolvedConvId, messageId: msg.id });
             }
         });
-    }, [messages, currentUserId, conversation.id]);
+    }, [messages, currentUserId, resolvedConvId]);
 
     const handleSend = useCallback(async () => {
         const content = inputValue.trim();
@@ -101,21 +131,28 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
     }, [sendMessage]);
 
     const headerName = isGroup
-        ? conversation.name
+        ? (groupName ?? conversation?.name ?? 'Group')
         : (otherUser?.displayName ?? otherUserId ?? 'Chat');
 
     const headerSub = isGroup
-        ? `${conversation.participants.length} participants`
+        ? `${conversation?.participants.length ?? 0} participants`
         : null;
 
-    // Build a map of userId -> displayName for group sender names
+    // Suppress unused variable warning
+    void currentProfile;
+
     const senderNames: Record<string, string> = {};
 
     return (
         <div className="flex flex-col h-full bg-background">
-            {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-xeta-surface border-b border-xeta-border flex-shrink-0">
-                <Button variant="ghost" size="icon" onClick={onBack} className="text-foreground hover:bg-xeta-elevated flex-shrink-0">
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 bg-xeta-surface border-b border-xeta-border flex-shrink-0">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onBack}
+                    className="text-foreground hover:bg-xeta-elevated flex-shrink-0"
+                >
                     <ArrowLeft className="w-5 h-5" />
                 </Button>
 
@@ -139,9 +176,33 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
                         <PresenceIndicator lastSeen={otherUser.lastSeen} showDot={false} />
                     ) : null}
                 </div>
+
+                {/* Voice & Video call buttons — only for 1-on-1 chats */}
+                {!isGroup && (
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowVoiceCall(true)}
+                            className="text-foreground hover:bg-xeta-elevated"
+                            title="Voice call"
+                        >
+                            <Phone className="w-5 h-5" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowVideoCall(true)}
+                            className="text-foreground hover:bg-xeta-elevated"
+                            title="Video call"
+                        >
+                            <Video className="w-5 h-5" />
+                        </Button>
+                    </div>
+                )}
             </div>
 
-            {/* Messages */}
+            {/* Messages — scrollable between sticky header and sticky input */}
             <div
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto px-4 py-4 space-y-2 min-h-0"
@@ -187,8 +248,8 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
                 </div>
             )}
 
-            {/* Input area */}
-            <div className="px-3 py-3 bg-xeta-surface border-t border-xeta-border flex-shrink-0">
+            {/* Sticky Input Bar */}
+            <div className="sticky bottom-0 z-20 px-3 py-3 bg-xeta-surface border-t border-xeta-border flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <input
                         ref={fileInputRef}
@@ -207,14 +268,14 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
                         <Paperclip className="w-5 h-5" />
                     </Button>
 
-                    <Input
+                    <input
                         ref={inputRef}
                         value={inputValue}
                         onChange={e => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Type a message..."
                         disabled={sendMessage.isPending}
-                        className="flex-1 bg-xeta-elevated border-xeta-border text-foreground placeholder:text-muted-foreground focus-visible:ring-xeta-green rounded-full px-4"
+                        className="flex-1 bg-xeta-elevated border border-xeta-border text-foreground placeholder:text-muted-foreground focus:border-xeta-green focus:outline-none rounded-full px-4 py-2 text-sm transition-colors"
                         maxLength={2000}
                     />
 
@@ -222,7 +283,7 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
                         onClick={handleSend}
                         disabled={!inputValue.trim() || sendMessage.isPending}
                         size="icon"
-                        className="w-10 h-10 rounded-full bg-xeta-green hover:bg-xeta-green-bright text-xeta-panel disabled:opacity-40 flex-shrink-0"
+                        className="w-10 h-10 rounded-full bg-xeta-green hover:opacity-90 text-white disabled:opacity-40 flex-shrink-0"
                     >
                         {sendMessage.isPending ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -232,6 +293,24 @@ export function ChatScreen({ conversation, currentUserId, onBack }: ChatScreenPr
                     </Button>
                 </div>
             </div>
+
+            {/* Voice Call Overlay */}
+            {showVoiceCall && (
+                <VoiceCallOverlay
+                    contactId={otherUser?.id ?? otherUserId ?? ''}
+                    contactName={otherUser?.displayName ?? headerName}
+                    onClose={() => setShowVoiceCall(false)}
+                />
+            )}
+
+            {/* Video Call Overlay */}
+            {showVideoCall && (
+                <VideoCallOverlay
+                    contactId={otherUser?.id ?? otherUserId ?? ''}
+                    contactName={otherUser?.displayName ?? headerName}
+                    onClose={() => setShowVideoCall(false)}
+                />
+            )}
         </div>
     );
 }

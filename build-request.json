@@ -1,36 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Fix post-registration navigation to immediately open chat list",
+  "title": "Fix 'connection not ready' error on Registration screen",
   "projectName": "Xeta",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-35",
-      "text": "In App.tsx and RegistrationScreen.tsx, fix the post-registration navigation flow so that immediately after a successful createUser call, the app transitions directly to the chat list (main screen) without any intermediate steps, loading screens, or delays. The currentUser/profile state must be updated synchronously or before the navigation check runs, so the app never loops back to the registration screen or gets stuck on a loading state.",
+      "id": "REQ-45",
+      "text": "Fix the 'connection not ready, please try again' error that appears on the RegistrationScreen when the user submits their username and display name. The root cause is that the backend actor (canister connection) is not yet initialized or ready when the registration form is submitted. Ensure the actor is fully initialized before the registration form is interactable or before the createUser call is made. If the actor is still loading, show a loading indicator and disable the submit button rather than allowing the call to fail. If the actor becomes unavailable mid-session, surface a clear, actionable error message (e.g., 'Unable to connect. Please wait a moment and try again.') and allow the user to retry without leaving the registration screen.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "once account created successfully app should open chat list main page directly"
+          "it is giving error on name and username screen connection not ready please try again"
         ]
       },
       "acceptanceCriteria": [
-        "After submitting the registration form and receiving a successful response from createUser, the app immediately renders the chat list screen.",
-        "The user is never shown a loading screen or redirected back to the registration screen after successful account creation.",
-        "The currentUser/profile state is populated before the navigation logic evaluates which screen to show.",
-        "If registration fails, the user remains on the registration screen and sees a readable error message."
+        "The registration form's submit button is disabled while the backend actor/connection is not yet ready.",
+        "A loading indicator is shown on the registration screen while the actor is initializing.",
+        "Once the actor is ready, the submit button becomes enabled and the user can register without any 'connection not ready' error.",
+        "If the actor fails to initialize within a reasonable timeout, a clear retry message is shown inline on the registration form.",
+        "Submitting the form with a valid username and display name successfully calls createUser on the backend without throwing a connection error.",
+        "After a successful createUser call, the app navigates to the chat list screen immediately."
+      ]
+    },
+    {
+      "id": "REQ-46",
+      "text": "In useQueries.ts, audit the useActor hook usage within the registration mutation. Ensure the actor reference used in the createUser call is always the latest authenticated actor instance and is not undefined or uninitialized at the time of the call. Add a guard that throws a user-friendly error (e.g., 'Connection not ready. Please try again.') only if the actor is genuinely unavailable, and re-check actor readiness before every mutation call that touches the backend.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "connection not ready please try again"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The createUser mutation in useQueries.ts checks that the actor is defined and non-null before invoking the canister method.",
+        "If the actor is undefined at mutation time, the error message shown is readable (e.g., 'Connection not ready. Please try again.') and does not crash the app.",
+        "When the actor is properly initialized, the mutation proceeds and completes without any 'connection not ready' error.",
+        "No unhandled promise rejection or console error occurs when the actor is briefly unavailable during initialization."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Do not alter the backend createUser function signature or data model.",
+    "Error messages displayed to the user must be in English and must be readable and actionable."
   ],
   "nonGoals": [
-    "Changing the registration form fields or validation logic.",
-    "Modifying the backend createUser function.",
-    "Altering the chat list screen UI."
+    "Changing the registration form fields or validation rules.",
+    "Modifying the backend actor or Motoko code.",
+    "Adding new authentication methods.",
+    "Redesigning the registration screen UI beyond the error/loading state changes."
   ],
   "imageRequirements": {
     "required": [],

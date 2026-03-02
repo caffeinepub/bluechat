@@ -35,6 +35,9 @@ export type CreateUserResult = {
 } | {
     __kind__: "userProfile";
     userProfile: UserProfile;
+} | {
+    __kind__: "usernameTaken";
+    usernameTaken: string;
 };
 export interface Message {
     id: string;

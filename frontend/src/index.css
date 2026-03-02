@@ -1,161 +1,131 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --radius: 0.5rem;
+  /* ── Dark theme (default) ── */
+  :root,
+  .dark {
+    --background:    oklch(0.14 0.01 160);
+    --foreground:    oklch(0.93 0.01 160);
 
-        /* Xeta dark green/charcoal theme */
-        --background: 0.14 0.01 200;
-        --foreground: 0.95 0.01 200;
-        --card: 0.18 0.015 200;
-        --card-foreground: 0.95 0.01 200;
-        --popover: 0.2 0.015 200;
-        --popover-foreground: 0.95 0.01 200;
-        --primary: 0.72 0.17 155;
-        --primary-foreground: 0.08 0.01 200;
-        --secondary: 0.22 0.015 200;
-        --secondary-foreground: 0.9 0.01 200;
-        --muted: 0.2 0.015 200;
-        --muted-foreground: 0.58 0.03 200;
-        --accent: 0.72 0.17 155;
-        --accent-foreground: 0.08 0.01 200;
-        --destructive: 0.62 0.22 25;
-        --destructive-foreground: 0.98 0 0;
-        --border: 0.28 0.02 200;
-        --input: 0.22 0.015 200;
-        --ring: 0.72 0.17 155;
-        --chart-1: 0.72 0.17 155;
-        --chart-2: 0.65 0.14 160;
-        --chart-3: 0.6 0.18 280;
-        --chart-4: 0.7 0.15 180;
-        --chart-5: 0.75 0.12 170;
-        --sidebar: 0.12 0.01 200;
-        --sidebar-foreground: 0.95 0.01 200;
-        --sidebar-primary: 0.72 0.17 155;
-        --sidebar-primary-foreground: 0.08 0.01 200;
-        --sidebar-accent: 0.2 0.015 200;
-        --sidebar-accent-foreground: 0.9 0.01 200;
-        --sidebar-border: 0.28 0.02 200;
-        --sidebar-ring: 0.72 0.17 155;
+    --card:          oklch(0.18 0.015 160);
+    --card-foreground: oklch(0.93 0.01 160);
 
-        /* Custom Xeta tokens */
-        --xeta-green: 0.72 0.17 155;
-        --xeta-green-bright: 0.82 0.19 155;
-        --xeta-green-dim: 0.55 0.13 155;
-        --xeta-panel: 0.12 0.01 200;
-        --xeta-surface: 0.18 0.015 200;
-        --xeta-elevated: 0.22 0.015 200;
-        --xeta-border: 0.28 0.02 200;
-        --sent-bubble: 0.38 0.14 155;
-        --received-bubble: 0.22 0.015 200;
-    }
+    --popover:       oklch(0.18 0.015 160);
+    --popover-foreground: oklch(0.93 0.01 160);
 
-    .dark {
-        --background: 0.12 0.01 200;
-        --foreground: 0.95 0.01 200;
-        --card: 0.16 0.015 200;
-        --card-foreground: 0.95 0.01 200;
-        --popover: 0.18 0.015 200;
-        --popover-foreground: 0.95 0.01 200;
-        --primary: 0.72 0.17 155;
-        --primary-foreground: 0.08 0.01 200;
-        --secondary: 0.2 0.015 200;
-        --secondary-foreground: 0.9 0.01 200;
-        --muted: 0.18 0.015 200;
-        --muted-foreground: 0.55 0.03 200;
-        --accent: 0.72 0.17 155;
-        --accent-foreground: 0.08 0.01 200;
-        --destructive: 0.62 0.22 25;
-        --destructive-foreground: 0.98 0 0;
-        --border: 0.26 0.02 200;
-        --input: 0.2 0.015 200;
-        --ring: 0.72 0.17 155;
-        --sidebar: 0.1 0.01 200;
-        --sidebar-foreground: 0.95 0.01 200;
-        --sidebar-primary: 0.72 0.17 155;
-        --sidebar-primary-foreground: 0.08 0.01 200;
-        --sidebar-accent: 0.18 0.015 200;
-        --sidebar-accent-foreground: 0.9 0.01 200;
-        --sidebar-border: 0.26 0.02 200;
-        --sidebar-ring: 0.72 0.17 155;
-    }
+    --primary:       oklch(0.65 0.18 155);
+    --primary-foreground: oklch(0.10 0.01 160);
 
-    * {
-        @apply border-border;
-    }
+    --secondary:     oklch(0.22 0.015 160);
+    --secondary-foreground: oklch(0.85 0.01 160);
 
-    body {
-        @apply bg-background text-foreground;
-        font-family: 'Inter', system-ui, sans-serif;
-        background-color: oklch(0.12 0.01 200);
-        color: oklch(0.95 0.01 200);
-    }
+    --muted:         oklch(0.22 0.015 160);
+    --muted-foreground: oklch(0.55 0.02 160);
 
-    ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-    }
+    --accent:        oklch(0.65 0.18 155);
+    --accent-foreground: oklch(0.10 0.01 160);
 
-    ::-webkit-scrollbar-track {
-        background: oklch(0.16 0.015 200);
-    }
+    --destructive:   oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.98 0.01 0);
 
-    ::-webkit-scrollbar-thumb {
-        background: oklch(0.3 0.03 200);
-        border-radius: 2px;
-    }
+    --border:        oklch(0.26 0.015 160);
+    --input:         oklch(0.22 0.015 160);
+    --ring:          oklch(0.65 0.18 155);
 
-    ::-webkit-scrollbar-thumb:hover {
-        background: oklch(0.72 0.17 155);
-    }
+    --radius: 0.75rem;
+
+    /* Xeta custom tokens */
+    --xeta-green:    oklch(0.65 0.18 155);
+    --xeta-panel:    oklch(0.17 0.012 160);
+    --xeta-surface:  oklch(0.20 0.013 160);
+    --xeta-elevated: oklch(0.24 0.015 160);
+    --xeta-border:   oklch(0.26 0.015 160);
+  }
+
+  /* ── Light theme ── */
+  :root:not(.dark),
+  .light {
+    --background:    oklch(0.97 0.005 160);
+    --foreground:    oklch(0.15 0.02 160);
+
+    --card:          oklch(1.00 0.000 0);
+    --card-foreground: oklch(0.15 0.02 160);
+
+    --popover:       oklch(1.00 0.000 0);
+    --popover-foreground: oklch(0.15 0.02 160);
+
+    --primary:       oklch(0.52 0.18 155);
+    --primary-foreground: oklch(0.98 0.005 160);
+
+    --secondary:     oklch(0.92 0.01 160);
+    --secondary-foreground: oklch(0.20 0.02 160);
+
+    --muted:         oklch(0.92 0.01 160);
+    --muted-foreground: oklch(0.48 0.03 160);
+
+    --accent:        oklch(0.52 0.18 155);
+    --accent-foreground: oklch(0.98 0.005 160);
+
+    --destructive:   oklch(0.52 0.22 25);
+    --destructive-foreground: oklch(0.98 0.01 0);
+
+    --border:        oklch(0.86 0.01 160);
+    --input:         oklch(0.92 0.01 160);
+    --ring:          oklch(0.52 0.18 155);
+
+    /* Xeta custom tokens — light */
+    --xeta-green:    oklch(0.52 0.18 155);
+    --xeta-panel:    oklch(0.99 0.003 160);
+    --xeta-surface:  oklch(0.94 0.007 160);
+    --xeta-elevated: oklch(0.90 0.008 160);
+    --xeta-border:   oklch(0.86 0.01 160);
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
+/* Custom scrollbar */
 @layer utilities {
-    .bg-sent-bubble {
-        background: linear-gradient(135deg, oklch(0.42 0.16 155), oklch(0.36 0.14 155));
-    }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--xeta-border) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--xeta-border);
+    border-radius: 2px;
+  }
 
-    .bg-received-bubble {
-        background: oklch(0.22 0.015 200);
-    }
-
-    .xeta-panel {
-        background: oklch(0.12 0.01 200);
-    }
-
-    .xeta-surface {
-        background: oklch(0.18 0.015 200);
-    }
-
-    .pulse-online {
-        animation: pulse-online 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-online {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-
-    @keyframes fade-in-up {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .animate-fade-in-up {
-        animation: fade-in-up 0.2s ease-out;
-    }
-
-    @keyframes accordion-down {
-        from { height: 0; }
-        to { height: var(--radix-accordion-content-height); }
-    }
-
-    @keyframes accordion-up {
-        from { height: var(--radix-accordion-content-height); }
-        to { height: 0; }
-    }
+  /* Message bubble helpers */
+  .bubble-sent {
+    @apply rounded-2xl rounded-br-sm;
+  }
+  .bubble-received {
+    @apply rounded-2xl rounded-bl-sm;
+  }
 }

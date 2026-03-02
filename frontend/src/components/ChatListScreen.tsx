@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MessageSquarePlus, Users, User, Search, Plus, Bot, Loader2, X } from 'lucide-react';
+import { MessageSquarePlus, Users, Search, Plus, Loader2, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { UserAvatar } from './UserAvatar';
@@ -14,10 +14,9 @@ interface ChatListScreenProps {
     onNewChat: () => void;
     onNewGroup: () => void;
     onOpenProfile: () => void;
-    onOpenXetaAI: () => void;
 }
 
-export function ChatListScreen({ currentUserId, onOpenChat, onNewChat, onNewGroup, onOpenProfile, onOpenXetaAI }: ChatListScreenProps) {
+export function ChatListScreen({ currentUserId, onOpenChat, onNewChat, onNewGroup, onOpenProfile }: ChatListScreenProps) {
     const { data: conversations = [], isLoading } = useGetMyConversations();
     const { data: currentProfile } = useGetCallerUserProfile();
     const { data: allUsers = [] } = useGetAllUsers();
@@ -75,10 +74,13 @@ export function ChatListScreen({ currentUserId, onOpenChat, onNewChat, onNewGrou
         }
     };
 
+    // Suppress unused variable warning — currentProfile may be used for future features
+    void currentProfile;
+
     return (
         <div className="flex flex-col h-full bg-background relative">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-xeta-surface border-b border-xeta-border flex-shrink-0">
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 bg-xeta-surface border-b border-xeta-border flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <img
                         src="/assets/generated/xeta-logo.dim_128x128.png"
@@ -99,180 +101,132 @@ export function ChatListScreen({ currentUserId, onOpenChat, onNewChat, onNewGrou
                 </div>
             </div>
 
-            {/* Search bar */}
-            <div className="px-3 py-2 bg-xeta-surface border-b border-xeta-border flex-shrink-0">
+            {/* Search Bar */}
+            <div className="px-4 py-2 bg-xeta-surface border-b border-xeta-border flex-shrink-0">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
+                        placeholder="Search people or chats…"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        placeholder="Search users..."
-                        className="pl-9 pr-8 bg-xeta-elevated border-xeta-border text-foreground placeholder:text-muted-foreground focus-visible:ring-xeta-green rounded-full text-sm h-9"
+                        className="pl-9 pr-9 bg-xeta-elevated border-xeta-border text-foreground placeholder:text-muted-foreground rounded-full h-9 text-sm"
                     />
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery('')}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-4 h-4" />
                         </button>
                     )}
                 </div>
             </div>
 
-            {/* Xeta AI pinned entry — always visible, not filtered */}
-            {!isSearching && (
-                <button
-                    onClick={onOpenXetaAI}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-xeta-elevated transition-colors border-b border-xeta-border bg-xeta-surface/60 flex-shrink-0"
-                >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-xeta-green to-xeta-green-dim flex items-center justify-center flex-shrink-0 shadow-green-glow-sm">
-                        <Bot className="w-5 h-5 text-xeta-panel" />
-                    </div>
-                    <div className="flex-1 min-w-0 text-left">
-                        <p className="text-sm font-semibold text-foreground">Xeta AI</p>
-                        <p className="text-xs text-xeta-green truncate">Your intelligent assistant</p>
-                    </div>
-                    <span className="text-[10px] text-xeta-green font-medium bg-xeta-green/10 px-2 py-0.5 rounded-full">AI</span>
-                </button>
-            )}
-
-            {/* New Chat FAB row — always visible, not filtered */}
-            {!isSearching && (
-                <div className="flex gap-2 px-4 py-2 border-b border-xeta-border/50 flex-shrink-0">
-                    <button
-                        onClick={onNewChat}
-                        className="flex items-center gap-2 text-xs text-xeta-green hover:text-xeta-green-bright transition-colors py-1"
-                    >
-                        <Plus className="w-4 h-4" />
-                        New Chat
-                    </button>
-                    <span className="text-xeta-border">·</span>
-                    <button
-                        onClick={onNewGroup}
-                        className="flex items-center gap-2 text-xs text-xeta-green hover:text-xeta-green-bright transition-colors py-1"
-                    >
-                        <Users className="w-4 h-4" />
-                        New Group
-                    </button>
-                </div>
-            )}
-
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto">
-                {/* Search results */}
+                {/* Search Results */}
                 {isSearching && (
-                    <>
+                    <div>
                         {filteredUsers.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-                                <Search className="w-8 h-8 text-muted-foreground mb-3" />
-                                <p className="text-muted-foreground text-sm">No users found for "{searchQuery}"</p>
-                                <p className="text-muted-foreground text-xs mt-1">Try a different name or username.</p>
+                            <div className="px-4 py-8 text-center text-muted-foreground text-sm">
+                                No users found for "{searchQuery}"
                             </div>
                         ) : (
-                            <>
-                                <p className="px-4 py-2 text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                                    Users
-                                </p>
-                                {filteredUsers.map(user => (
-                                    <button
-                                        key={user.id}
-                                        onClick={() => handleSelectUser(user.id)}
-                                        disabled={createOneOnOne.isPending}
-                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-xeta-elevated transition-colors border-b border-xeta-border/50 disabled:opacity-60"
-                                    >
-                                        <UserAvatar displayName={user.displayName} avatarUrl={user.avatarUrl} size="md" />
-                                        <div className="flex-1 min-w-0 text-left">
-                                            <p className="text-sm font-semibold text-foreground truncate">{user.displayName}</p>
-                                            <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
-                                        </div>
-                                        {createOneOnOne.isPending && (
-                                            <Loader2 className="w-4 h-4 animate-spin text-xeta-green" />
-                                        )}
-                                    </button>
-                                ))}
-                            </>
-                        )}
-                    </>
-                )}
-
-                {/* Conversation list */}
-                {!isSearching && (
-                    <>
-                        {isLoading ? (
-                            <div className="flex items-center justify-center py-16">
-                                <Loader2 className="w-6 h-6 animate-spin text-xeta-green" />
-                            </div>
-                        ) : sorted.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-                                <div className="w-20 h-20 rounded-full bg-xeta-elevated flex items-center justify-center mb-5">
-                                    <MessageSquarePlus className="w-9 h-9 text-muted-foreground" />
-                                </div>
-                                <h3 className="text-base font-semibold text-foreground mb-1">No conversations yet</h3>
-                                <p className="text-muted-foreground text-sm">
-                                    Search for users above or tap New Chat to get started.
-                                </p>
-                            </div>
-                        ) : (
-                            sorted.map(conv => (
+                            filteredUsers.map(user => (
                                 <button
-                                    key={conv.id}
-                                    onClick={() => onOpenChat(conv)}
-                                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-xeta-elevated transition-colors border-b border-xeta-border/50"
+                                    key={user.id}
+                                    onClick={() => handleSelectUser(user.id)}
+                                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-xeta-elevated transition-colors text-left"
                                 >
-                                    {conv.conversationType === ConversationType.group ? (
-                                        <div className="w-10 h-10 rounded-full bg-xeta-elevated flex items-center justify-center flex-shrink-0">
-                                            <Users className="w-5 h-5 text-xeta-green" />
-                                        </div>
-                                    ) : (
-                                        <UserAvatar
-                                            displayName={getConvName(conv)}
-                                            size="md"
-                                        />
-                                    )}
-                                    <div className="flex-1 min-w-0 text-left">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <p className="text-sm font-semibold text-foreground truncate">{getConvName(conv)}</p>
-                                            <span className="text-[10px] text-muted-foreground flex-shrink-0">{getLastTime(conv)}</span>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground truncate mt-0.5">{getLastMessage(conv)}</p>
+                                    <UserAvatar displayName={user.displayName} size="md" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-foreground truncate">{user.displayName}</p>
+                                        <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
                                     </div>
                                 </button>
                             ))
+                        )}
+                    </div>
+                )}
+
+                {/* Conversation List */}
+                {!isSearching && (
+                    <>
+                        {isLoading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <Loader2 className="w-6 h-6 animate-spin text-xeta-green" />
+                            </div>
+                        ) : sorted.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-3">
+                                <div className="w-16 h-16 rounded-full bg-xeta-elevated flex items-center justify-center">
+                                    <MessageSquarePlus className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                                <p className="text-muted-foreground text-sm">No conversations yet.</p>
+                                <p className="text-xs text-muted-foreground">
+                                    Tap the <span className="text-xeta-green font-medium">+</span> button to start chatting.
+                                </p>
+                            </div>
+                        ) : (
+                            sorted.map(conv => {
+                                const name = getConvName(conv);
+                                const lastMsg = getLastMessage(conv);
+                                const lastTime = getLastTime(conv);
+
+                                return (
+                                    <button
+                                        key={conv.id}
+                                        onClick={() => onOpenChat(conv)}
+                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-xeta-elevated transition-colors text-left border-b border-xeta-border/30"
+                                    >
+                                        <div className="relative flex-shrink-0">
+                                            <UserAvatar
+                                                displayName={name}
+                                                size="md"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <p className="text-sm font-semibold text-foreground truncate">{name}</p>
+                                                <span className="text-xs text-muted-foreground flex-shrink-0">{lastTime}</span>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground truncate mt-0.5">{lastMsg}</p>
+                                        </div>
+                                    </button>
+                                );
+                            })
                         )}
                     </>
                 )}
             </div>
 
-            {/* FAB for new chat (floating, only when not searching) */}
-            {!isSearching && (
-                <div className="absolute bottom-4 right-4">
-                    {showFab && (
-                        <div className="absolute bottom-14 right-0 flex flex-col gap-2 items-end animate-fade-in-up">
-                            <button
-                                onClick={() => { setShowFab(false); onNewGroup(); }}
-                                className="flex items-center gap-2 bg-xeta-elevated border border-xeta-border text-foreground text-sm font-medium px-4 py-2 rounded-full shadow-card-dark hover:bg-xeta-surface transition-colors"
-                            >
-                                <Users className="w-4 h-4 text-xeta-green" />
-                                New Group
-                            </button>
-                            <button
-                                onClick={() => { setShowFab(false); onNewChat(); }}
-                                className="flex items-center gap-2 bg-xeta-elevated border border-xeta-border text-foreground text-sm font-medium px-4 py-2 rounded-full shadow-card-dark hover:bg-xeta-surface transition-colors"
-                            >
-                                <MessageSquarePlus className="w-4 h-4 text-xeta-green" />
-                                New Chat
-                            </button>
-                        </div>
-                    )}
-                    <button
-                        onClick={() => setShowFab(v => !v)}
-                        className="w-12 h-12 rounded-full bg-xeta-green hover:bg-xeta-green-bright text-xeta-panel flex items-center justify-center shadow-green-glow transition-colors"
-                    >
-                        <Plus className={`w-6 h-6 transition-transform ${showFab ? 'rotate-45' : ''}`} />
-                    </button>
-                </div>
-            )}
+            {/* FAB */}
+            <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2 z-20">
+                {showFab && (
+                    <div className="flex flex-col items-end gap-2 mb-1">
+                        <button
+                            onClick={() => { setShowFab(false); onNewGroup(); }}
+                            className="flex items-center gap-2 bg-xeta-surface border border-xeta-border text-foreground text-sm font-medium rounded-full px-4 py-2 shadow-lg hover:bg-xeta-elevated transition-colors"
+                        >
+                            <Users className="w-4 h-4 text-xeta-green" />
+                            New Group
+                        </button>
+                        <button
+                            onClick={() => { setShowFab(false); onNewChat(); }}
+                            className="flex items-center gap-2 bg-xeta-surface border border-xeta-border text-foreground text-sm font-medium rounded-full px-4 py-2 shadow-lg hover:bg-xeta-elevated transition-colors"
+                        >
+                            <MessageSquarePlus className="w-4 h-4 text-xeta-green" />
+                            New Chat
+                        </button>
+                    </div>
+                )}
+                <button
+                    onClick={() => setShowFab(v => !v)}
+                    className="w-14 h-14 rounded-full bg-xeta-green hover:bg-xeta-green-bright text-xeta-panel flex items-center justify-center shadow-xeta-glow transition-all"
+                    aria-label="New conversation"
+                >
+                    {showFab ? <X className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+                </button>
+            </div>
         </div>
     );
 }

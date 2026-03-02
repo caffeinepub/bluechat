@@ -1,14 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
-  "summary": "A WhatsApp-like full-featured messaging app named 'Xeta' with real-time chat, user accounts, contacts, media sharing, and other core WhatsApp-style features. Includes WhatsApp-style bottom navigation (Chats, Updates, Calls, Settings), a pinned Xeta AI chat entry at the top of the chat list, searchable/persistent user storage, larger logo in the top bar, and footer copyright removed.",
+  "projectStateVersion": 31,
+  "summary": "A WhatsApp-like full-featured messaging app named 'Xeta' with real-time chat, user accounts, contacts, media sharing, and other core WhatsApp-style features. Includes WhatsApp-style bottom navigation (Chats, Updates, Calls, Settings), searchable/persistent user storage, larger logo in the top bar, footer copyright removed, unique username enforcement, and sticky header/footer on the main Chats tab only. Xeta AI feature has been permanently removed.",
   "architectural_notes": [
     "Replacing Bluetooth-based architecture with internet-based real-time messaging using WebSockets or similar technology",
-    "Requires backend user authentication, message storage, and real-time event broadcasting"
+    "Requires backend user authentication, message storage, and real-time event broadcasting",
+    "Username uniqueness must be enforced at both the backend (createUser in main.mo) and frontend (registration screen) with clear error messages"
   ],
   "known_issues": [
     "After sign-in, the next screen fails to load / takes too long, and the keyboard flickers (shows and hides repeatedly) during loading",
-    "Registration fails on the registration screen and the app does not navigate to the next screen after submitting registration"
+    "Registration fails on the registration screen and the app does not navigate to the next screen after submitting registration",
+    "Registration screen shows 'connection not ready, please try again' error when submitting name and username"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -251,6 +253,86 @@
         "REQ-35"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-permanently-remove-the-xeta-ai-feature-from-the-app-delete-the-xetaaichatscreen-tsx-component-remove-the-pinned-xeta-ai-entry-from-chatlistscreen-tsx-including-any-fab-or-list-entry-that-opens-the-ai-chat-and-remove-all-references-to-xeta-ai-navigation-from-app-tsx",
+      "title": "Permanently remove the Xeta AI feature from the app: delete the XetaAIChatScreen.tsx component, remove the pinned Xeta AI entry from ChatListScreen.tsx (including any FAB or list entry that opens the AI chat), and remove all references to Xeta AI navigation from App.tsx.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enforce-unique-usernames-on-the-frontend-in-registrationscreen-tsx-after-a-createuser-call-returns-a-username-taken-error-display-a-clear-user-readable-error-message-e-g-username-is-already-taken-please-choose-a-different-one-inline-on-the-registration-form-without-navigating-away",
+      "title": "Enforce unique usernames on the frontend: in RegistrationScreen.tsx, after a createUser call returns a username-taken error, display a clear, user-readable error message (e.g., 'Username is already taken. Please choose a different one.') inline on the registration form without navigating away.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-top-header-bar-and-the-bottom-navigation-bar-sticky-fixed-exclusively-on-the-chats-tab-screen-chatlistscreen-apply-position-sticky-or-fixed-css-to-the-header-and-bottomnavigation-only-when-the-active-tab-is-chats-on-all-other-tabs-updates-calls-settings-and-on-inner-screens-individual-chat-profile-group-creation-contacts-the-header-and-bottom-nav-must-scroll-normally-or-remain-in-their-current-non-sticky-state",
+      "title": "Make the top header bar and the bottom navigation bar sticky/fixed exclusively on the Chats tab screen (ChatListScreen). Apply position: sticky or fixed CSS to the header and BottomNavigation only when the active tab is 'chats'. On all other tabs (Updates, Calls, Settings) and on inner screens (individual chat, profile, group creation, contacts), the header and bottom nav must scroll normally or remain in their current non-sticky state.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-any-remaining-footer-copyright-section-copyright-text-or-footer-element-from-every-screen-in-the-app-no-copyright-line-or-footer-element-should-appear-anywhere-in-the-ui",
+      "title": "Remove any remaining footer copyright section, copyright text, or footer element from every screen in the app. No copyright line or footer element should appear anywhere in the UI.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-voice-calling-feature-accessible-from-the-individual-chat-screen-chatscreen-tsx-a-phone-voice-call-icon-button-must-appear-in-the-chat-header-tapping-it-initiates-a-voice-call-to-the-other-user-using-the-browser-s-webrtc-api-getusermedia-with-audio-only-display-an-in-call-overlay-ui-showing-the-contact-s-name-avatar-call-duration-timer-a-mute-button-and-an-end-call-button-the-callsscreen-calls-tab-must-list-recent-voice-call-history-entries-caller-recipient-timestamp-call-type-voice",
+      "title": "Add a voice calling feature accessible from the individual chat screen (ChatScreen.tsx). A phone/voice call icon button must appear in the chat header. Tapping it initiates a voice call to the other user using the browser's WebRTC API (getUserMedia with audio only). Display an in-call overlay UI showing the contact's name/avatar, call duration timer, a mute button, and an end-call button. The CallsScreen (Calls tab) must list recent voice call history entries (caller, recipient, timestamp, call type: voice).",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-video-calling-feature-accessible-from-the-individual-chat-screen-chatscreen-tsx-a-video-camera-icon-button-must-appear-in-the-chat-header-alongside-the-voice-call-button-tapping-it-initiates-a-video-call-to-the-other-user-using-webrtc-getusermedia-with-audio-and-video-display-an-in-call-overlay-with-a-local-video-preview-picture-in-picture-style-a-remote-video-placeholder-a-mute-button-a-camera-toggle-button-and-an-end-call-button-the-callsscreen-calls-tab-must-also-list-recent-video-call-history-entries-caller-recipient-timestamp-call-type-video",
+      "title": "Add a video calling feature accessible from the individual chat screen (ChatScreen.tsx). A video camera icon button must appear in the chat header alongside the voice call button. Tapping it initiates a video call to the other user using WebRTC (getUserMedia with audio and video). Display an in-call overlay with a local video preview (picture-in-picture style), a remote video placeholder, a mute button, a camera toggle button, and an end-call button. The CallsScreen (Calls tab) must also list recent video call history entries (caller, recipient, timestamp, call type: video).",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dark-light-mode-toggle-in-the-settings-tab-profilescreen-or-a-dedicated-settingsscreen-the-toggle-must-switch-the-entire-app-between-the-existing-dark-theme-and-a-light-theme-the-selected-theme-preference-must-persist-across-sessions-e-g-stored-in-localstorage-the-light-theme-should-use-light-backgrounds-dark-text-and-appropriately-adjusted-accent-colors-consistent-with-the-xeta-brand-palette-apply-the-active-theme-class-e-g-dark-or-light-to-the-document-root-so-tailwind-dark-mode-utilities-take-effect-globally",
+      "title": "Add a dark/light mode toggle in the Settings tab (ProfileScreen or a dedicated SettingsScreen). The toggle must switch the entire app between the existing dark theme and a light theme. The selected theme preference must persist across sessions (e.g., stored in localStorage). The light theme should use light backgrounds, dark text, and appropriately adjusted accent colors consistent with the Xeta brand palette. Apply the active theme class (e.g., 'dark' or 'light') to the document root so Tailwind dark-mode utilities take effect globally.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-chatscreen-tsx-make-the-top-contact-user-bar-chat-header-and-the-bottom-message-input-bar-sticky-fixed-so-they-remain-always-visible-while-the-user-scrolls-through-the-message-list-the-message-list-area-between-the-header-and-input-bar-must-be-independently-scrollable-this-sticky-behavior-applies-only-to-the-individual-chat-screen-and-must-not-affect-any-other-screen",
+      "title": "In ChatScreen.tsx, make the top contact/user bar (chat header) and the bottom message input bar sticky/fixed so they remain always visible while the user scrolls through the message list. The message list area between the header and input bar must be independently scrollable. This sticky behavior applies only to the individual chat screen and must not affect any other screen.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-connection-not-ready-please-try-again-error-that-appears-on-the-registrationscreen-when-the-user-submits-their-username-and-display-name-the-root-cause-is-that-the-backend-actor-canister-connection-is-not-yet-initialized-or-ready-when-the-registration-form-is-submitted-ensure-the-actor-is-fully-initialized-before-the-registration-form-is-interactable-or-before-the-createuser-call-is-made-if-the-actor-is-still-loading-show-a-loading-indicator-and-disable-the-submit-button-rather-than-allowing-the-call-to-fail-if-the-actor-becomes-unavailable-mid-session-surface-a-clear-actionable-error-message-e-g-unable-to-connect-please-wait-a-moment-and-try-again-and-allow-the-user-to-retry-without-leaving-the-registration-screen",
+      "title": "Fix the 'connection not ready, please try again' error that appears on the RegistrationScreen when the user submits their username and display name. The root cause is that the backend actor (canister connection) is not yet initialized or ready when the registration form is submitted. Ensure the actor is fully initialized before the registration form is interactable or before the createUser call is made. If the actor is still loading, show a loading indicator and disable the submit button rather than allowing the call to fail. If the actor becomes unavailable mid-session, surface a clear, actionable error message (e.g., 'Unable to connect. Please wait a moment and try again.') and allow the user to retry without leaving the registration screen.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-usequeries-ts-audit-the-useactor-hook-usage-within-the-registration-mutation-ensure-the-actor-reference-used-in-the-createuser-call-is-always-the-latest-authenticated-actor-instance-and-is-not-undefined-or-uninitialized-at-the-time-of-the-call-add-a-guard-that-throws-a-user-friendly-error-e-g-connection-not-ready-please-try-again-only-if-the-actor-is-genuinely-unavailable-and-re-check-actor-readiness-before-every-mutation-call-that-touches-the-backend",
+      "title": "In useQueries.ts, audit the useActor hook usage within the registration mutation. Ensure the actor reference used in the createUser call is always the latest authenticated actor instance and is not undefined or uninitialized at the time of the call. Add a guard that throws a user-friendly error (e.g., 'Connection not ready. Please try again.') only if the actor is genuinely unavailable, and re-check actor readiness before every mutation call that touches the backend.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -333,12 +415,6 @@
       "status": "pending"
     },
     {
-      "id": "AR-25",
-      "summary": "Add Xeta AI chat entry pinned at the top of the chat list (above New Chat button) that opens an AI-powered chat thread named 'Xeta AI'",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
       "id": "AR-26",
       "summary": "Add WhatsApp-style bottom navigation bar with four tabs: Chats (chat list), Updates (status/stories), Calls (call history), Settings (app settings & profile), each with matching icons",
       "reqIds": [],
@@ -373,6 +449,56 @@
     {
       "id": "AR-34",
       "summary": "After successful account creation/registration, automatically navigate the user directly to the chat list main page without any intermediate steps or delays",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Remove Xeta AI feature permanently — delete the pinned Xeta AI chat entry and its entire chat screen/component from the app",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Enforce unique usernames — add backend validation in main.mo to reject duplicate usernames during createUser, and surface a clear error on the registration screen if the username is already taken",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Make the top header bar and bottom navigation bar sticky/fixed on the main Chats tab screen only; other tabs and inner screens remain unaffected",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Enforce unique usernames on the backend: in backend/main.mo, the createUser function must check whether the requested username already exists in the user store before creating a new account. If the username is already taken, return a clear error variant (e.g., #usernameTaken) instead of creating a duplicate entry.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "Add voice calling feature — users can make voice calls to each other",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "Add video calling feature — users can make video calls to each other",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-42",
+      "summary": "Add dark/light mode toggle in the Settings tab so users can switch between dark and bright themes",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-43",
+      "summary": "On the individual chat page, make the top user/contact bar and the bottom message input bar sticky/fixed so they remain visible while scrolling through messages",
       "reqIds": [],
       "status": "pending"
     }

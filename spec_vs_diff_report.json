@@ -1,15 +1,24 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-02T04:08:39.922Z",
-  "summary": "The diff implements the required post-registration navigation fix in both App.tsx and RegistrationScreen.tsx. A `registeredProfile` local state is introduced as an immediate fallback after registration, and RegistrationScreen now passes the newly created UserProfile directly to the `onRegistered` callback. This allows the app to immediately render the chat list without waiting for a query refetch. Error handling in RegistrationScreen surfaces readable error messages for various failure cases. All requirements from REQ-35 appear to be addressed.",
-  "missing_requirements": [],
+  "generatedAt": "2026-03-02T06:00:01.756Z",
+  "summary": "The diff modifies RegistrationScreen.tsx and useQueries.ts to address both REQ-45 and REQ-46. REQ-45 is largely implemented: actor readiness check via useActor, submit button disabled while not ready, inline error messages for connection issues, and navigation after successful createUser. REQ-46 is implemented: guard checks in the mutation for actorFetching and null actor, user-friendly error messages, and try-catch for transient network errors. However, the acceptance criterion for REQ-45 requiring a visible loading indicator while the actor is initializing is only partially confirmed by the truncated diff. The timeout-based retry message AC for REQ-45 also appears unimplemented.",
+  "missing_requirements": [
+    {
+      "id": "REQ-45",
+      "requirement": "If the actor fails to initialize within a reasonable timeout, a clear retry message is shown inline on the registration form.",
+      "reason": "The diff does not show any timeout mechanism. The component tracks actorFetching state and shows an error if not ready at submit time, but there is no timer that triggers a retry message if initialization stalls beyond a threshold.",
+      "evidence": [
+        "frontend/src/components/RegistrationScreen.tsx"
+      ]
+    }
+  ],
   "hallucinated_features": [],
-  "confidence": 0.91,
+  "confidence": 0.8,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
     "frontend/src/components/RegistrationScreen.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

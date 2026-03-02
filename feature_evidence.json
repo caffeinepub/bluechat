@@ -2,10 +2,9 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-app-tsx-and-registrationscreen-tsx-fix-the-post-registration-navigation-flow-so-that-immediately-after-a-successful-createuser-call-the-app-transitions-directly-to-the-chat-list-main-screen-without-any-intermediate-steps-loading-screens-or-delays-the-currentuser-profile-state-must-be-updated-synchronously-or-before-the-navigation-check-runs-so-the-app-never-loops-back-to-the-registration-screen-or-gets-stuck-on-a-loading-state",
-      "featureTitle": "In App.tsx and RegistrationScreen.tsx, fix the post-registration navigation flow so that immediately after a successful createUser call, the app transitions directly to the chat list (main screen) without any intermediate steps, loading screens, or delays. The currentUser/profile state must be updated synchronously or before the navigation check runs, so the app never loops back to the registration screen or gets stuck on a loading state.",
+      "featureId": "feature-fix-the-connection-not-ready-please-try-again-error-that-appears-on-the-registrationscreen-when-the-user-submits-their-username-and-display-name-the-root-cause-is-that-the-backend-actor-canister-connection-is-not-yet-initialized-or-ready-when-the-registration-form-is-submitted-ensure-the-actor-is-fully-initialized-before-the-registration-form-is-interactable-or-before-the-createuser-call-is-made-if-the-actor-is-still-loading-show-a-loading-indicator-and-disable-the-submit-button-rather-than-allowing-the-call-to-fail-if-the-actor-becomes-unavailable-mid-session-surface-a-clear-actionable-error-message-e-g-unable-to-connect-please-wait-a-moment-and-try-again-and-allow-the-user-to-retry-without-leaving-the-registration-screen",
+      "featureTitle": "Fix the 'connection not ready, please try again' error that appears on the RegistrationScreen when the user submits their username and display name. The root cause is that the backend actor (canister connection) is not yet initialized or ready when the registration form is submitted. Ensure the actor is fully initialized before the registration form is interactable or before the createUser call is made. If the actor is still loading, show a loading indicator and disable the submit button rather than allowing the call to fail. If the actor becomes unavailable mid-session, surface a clear, actionable error message (e.g., 'Unable to connect. Please wait a moment and try again.') and allow the user to retry without leaving the registration screen.",
       "files": [
-        "frontend/src/App.tsx",
         "frontend/src/components/RegistrationScreen.tsx"
       ],
       "components": [
@@ -18,7 +17,27 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-35"
+        "REQ-45"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-usequeries-ts-audit-the-useactor-hook-usage-within-the-registration-mutation-ensure-the-actor-reference-used-in-the-createuser-call-is-always-the-latest-authenticated-actor-instance-and-is-not-undefined-or-uninitialized-at-the-time-of-the-call-add-a-guard-that-throws-a-user-friendly-error-e-g-connection-not-ready-please-try-again-only-if-the-actor-is-genuinely-unavailable-and-re-check-actor-readiness-before-every-mutation-call-that-touches-the-backend",
+      "featureTitle": "In useQueries.ts, audit the useActor hook usage within the registration mutation. Ensure the actor reference used in the createUser call is always the latest authenticated actor instance and is not undefined or uninitialized at the time of the call. Add a guard that throws a user-friendly error (e.g., 'Connection not ready. Please try again.') only if the actor is genuinely unavailable, and re-check actor readiness before every mutation call that touches the backend.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-46"
       ],
       "confidence": "high"
     }

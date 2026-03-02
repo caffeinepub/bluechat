@@ -4,27 +4,28 @@ import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile, useUpdateLastSeen, useCreateOneOnOneConversation } from './hooks/useQueries';
 import { RegistrationScreen } from './components/RegistrationScreen';
 import { ChatListScreen } from './components/ChatListScreen';
-import { ChatScreen } from './components/ChatScreen';
+import ChatScreen from './components/ChatScreen';
 import { ContactsList } from './components/ContactsList';
 import { CreateGroupScreen } from './components/CreateGroupScreen';
-import { ProfileScreen } from './components/ProfileScreen';
+import ProfileScreen from './components/ProfileScreen';
 import { BottomNavigation, type BottomTab } from './components/BottomNavigation';
-import { UpdatesScreen } from './components/UpdatesScreen';
-import { CallsScreen } from './components/CallsScreen';
-import { XetaAIChatScreen } from './components/XetaAIChatScreen';
+import UpdatesScreen from './components/UpdatesScreen';
+import CallsScreen from './components/CallsScreen';
 import type { ConversationView, UserProfile } from './backend';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { initTheme } from './hooks/useTheme';
 
-// How long (ms) to wait before showing a timeout/retry UI
+// Apply persisted theme before first render
+initTheme();
+
 const PROFILE_FETCH_TIMEOUT_MS = 15_000;
 
 type Screen =
     | { type: 'chat-list' }
     | { type: 'chat'; conversation: ConversationView }
     | { type: 'contacts' }
-    | { type: 'create-group' }
-    | { type: 'xeta-ai' };
+    | { type: 'create-group' };
 
 export default function App() {
     const { login, loginStatus, identity, clear } = useInternetIdentity();
@@ -45,20 +46,12 @@ export default function App() {
 
     const [screen, setScreen] = React.useState<Screen>({ type: 'chat-list' });
     const [activeTab, setActiveTab] = useState<BottomTab>('chats');
-
-    // Store the newly registered profile locally so we can immediately show
-    // the chat list without waiting for the query to refetch.
     const [registeredProfile, setRegisteredProfile] = useState<UserProfile | null>(null);
-
-    // Timeout state: if loading takes too long, show a retry option
     const [timedOut, setTimedOut] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // The effective profile: prefer the query result, fall back to the locally
-    // stored registered profile so the app never flickers back to registration.
     const effectiveProfile = userProfile ?? registeredProfile;
 
-    // Start timeout when authenticated but profile not yet fetched
     useEffect(() => {
         if (isAuthenticated && profileLoading && !profileFetched) {
             setTimedOut(false);
@@ -82,15 +75,12 @@ export default function App() {
         };
     }, [isAuthenticated, profileLoading, profileFetched, profileError]);
 
-    // Once the query resolves with a real profile, clear the local registered
-    // profile cache — the query is now the source of truth.
     useEffect(() => {
         if (userProfile && registeredProfile) {
             setRegisteredProfile(null);
         }
     }, [userProfile, registeredProfile]);
 
-    // Update last seen on mount and periodically
     useEffect(() => {
         if (isAuthenticated && effectiveProfile) {
             updateLastSeen.mutate();
@@ -126,8 +116,6 @@ export default function App() {
         refetchProfile();
     }, [refetchProfile]);
 
-    // Called by RegistrationScreen with the newly created profile so we can
-    // immediately navigate to the chat list without waiting for a refetch.
     const handleRegistered = useCallback((profile: UserProfile) => {
         setRegisteredProfile(profile);
         setScreen({ type: 'chat-list' });
@@ -136,7 +124,6 @@ export default function App() {
 
     const handleTabChange = useCallback((tab: BottomTab) => {
         setActiveTab(tab);
-        // When switching to chats tab, go back to chat list
         if (tab === 'chats') {
             setScreen({ type: 'chat-list' });
         }
@@ -162,7 +149,7 @@ export default function App() {
                     <button
                         onClick={login}
                         disabled={isLoggingIn}
-                        className="w-full flex items-center justify-center gap-2 bg-xeta-green hover:bg-xeta-green-bright text-xeta-panel font-semibold rounded-full py-3 px-6 transition-colors disabled:opacity-60"
+                        className="w-full flex items-center justify-center gap-2 bg-xeta-green hover:opacity-90 text-white font-semibold rounded-full py-3 px-6 transition-opacity disabled:opacity-60"
                     >
                         {isLoggingIn ? (
                             <><Loader2 className="w-4 h-4 animate-spin" />Connecting...</>
@@ -175,25 +162,11 @@ export default function App() {
                         Secured by Internet Identity. No passwords needed.
                     </p>
                 </div>
-
-                <footer className="absolute bottom-4 text-center text-xs text-muted-foreground">
-                    Built with ❤️ using{' '}
-                    <a
-                        href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== 'undefined' ? window.location.hostname : 'xeta-app')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-xeta-green"
-                    >
-                        caffeine.ai
-                    </a>
-                </footer>
             </div>
         );
     }
 
     // ── Loading profile ────────────────────────────────────────────────────────
-    // Only show the loading screen if we have no profile at all (not even a
-    // locally stored registered one) and the query hasn't resolved yet.
     const isLoadingProfile = !effectiveProfile && profileLoading && !profileFetched && !profileError;
 
     if (isLoadingProfile) {
@@ -210,7 +183,7 @@ export default function App() {
                     </p>
                     <button
                         onClick={handleRetry}
-                        className="flex items-center gap-2 bg-xeta-green hover:bg-xeta-green-bright text-xeta-panel font-semibold rounded-full py-2 px-5 transition-colors text-sm"
+                        className="flex items-center gap-2 bg-xeta-green hover:opacity-90 text-white font-semibold rounded-full py-2 px-5 transition-opacity text-sm"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Retry
@@ -234,18 +207,16 @@ export default function App() {
     }
 
     // ── Registration ───────────────────────────────────────────────────────────
-    // Show registration only when the query has resolved and there's truly no profile.
     if (!effectiveProfile && (profileFetched || profileError)) {
         return (
             <>
                 <RegistrationScreen onRegistered={handleRegistered} />
-                <Toaster theme="dark" />
+                <Toaster />
             </>
         );
     }
 
-    // ── Determine if we're in a full-screen sub-view (no bottom nav) ──────────
-    const isSubScreen = screen.type === 'chat' || screen.type === 'contacts' || screen.type === 'create-group' || screen.type === 'xeta-ai';
+    const isSubScreen = screen.type === 'chat' || screen.type === 'contacts' || screen.type === 'create-group';
 
     // ── Main app ───────────────────────────────────────────────────────────────
     return (
@@ -254,8 +225,18 @@ export default function App() {
                 {/* Sub-screens (full screen, no bottom nav) */}
                 {screen.type === 'chat' && (
                     <ChatScreen
-                        conversation={screen.conversation}
+                        conversationId={screen.conversation.id}
                         currentUserId={effectiveProfile?.id ?? ''}
+                        otherUser={
+                            screen.conversation.participants.find(p => p !== effectiveProfile?.id)
+                                ? undefined
+                                : undefined
+                        }
+                        groupName={
+                            screen.conversation.conversationType === 'group' as unknown
+                                ? screen.conversation.name
+                                : undefined
+                        }
                         onBack={() => {
                             setScreen({ type: 'chat-list' });
                             setActiveTab('chats');
@@ -283,15 +264,6 @@ export default function App() {
                     />
                 )}
 
-                {screen.type === 'xeta-ai' && (
-                    <XetaAIChatScreen
-                        onBack={() => {
-                            setScreen({ type: 'chat-list' });
-                            setActiveTab('chats');
-                        }}
-                    />
-                )}
-
                 {/* Main tab screens (with bottom nav) */}
                 {!isSubScreen && (
                     <>
@@ -302,7 +274,6 @@ export default function App() {
                                 onNewChat={() => setScreen({ type: 'contacts' })}
                                 onNewGroup={() => setScreen({ type: 'create-group' })}
                                 onOpenProfile={() => setActiveTab('settings')}
-                                onOpenXetaAI={() => setScreen({ type: 'xeta-ai' })}
                             />
                         )}
 
@@ -322,12 +293,13 @@ export default function App() {
                 )}
             </main>
 
-            {/* Bottom navigation — hidden on full-screen sub-screens */}
             {!isSubScreen && (
-                <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+                <div className={activeTab === 'chats' ? 'sticky bottom-0 z-10' : ''}>
+                    <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+                </div>
             )}
 
-            <Toaster theme="dark" />
+            <Toaster />
         </div>
     );
 }

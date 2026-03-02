@@ -121,6 +121,9 @@ export type CreateUserResult = {
 } | {
     __kind__: "userProfile";
     userProfile: UserProfile;
+} | {
+    __kind__: "usernameTaken";
+    usernameTaken: string;
 };
 export interface Message {
     id: string;
@@ -786,12 +789,17 @@ function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Ui
     authenticationError: string;
 } | {
     userProfile: _UserProfile;
+} | {
+    usernameTaken: string;
 }): {
     __kind__: "authenticationError";
     authenticationError: string;
 } | {
     __kind__: "userProfile";
     userProfile: UserProfile;
+} | {
+    __kind__: "usernameTaken";
+    usernameTaken: string;
 } {
     return "authenticationError" in value ? {
         __kind__: "authenticationError",
@@ -799,6 +807,9 @@ function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Ui
     } : "userProfile" in value ? {
         __kind__: "userProfile",
         userProfile: from_candid_UserProfile_n31(_uploadFile, _downloadFile, value.userProfile)
+    } : "usernameTaken" in value ? {
+        __kind__: "usernameTaken",
+        usernameTaken: value.usernameTaken
     } : value;
 }
 function from_candid_variant_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

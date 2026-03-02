@@ -42,17 +42,45 @@ export function useGetCallerUserProfile() {
 }
 
 export function useCreateUser() {
-    const { actor } = useActor();
+    const { actor, isFetching: actorFetching } = useActor();
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async ({ username, displayName }: { username: string; displayName: string }) => {
-            if (!actor) throw new Error('Actor not initialized');
-            const result = await actor.createUser(username, displayName);
+            // Guard: ensure actor is fully initialized before proceeding
+            if (actorFetching) {
+                throw new Error('Connection not ready. Please wait a moment and try again.');
+            }
+            if (!actor) {
+                throw new Error('Connection not ready. Please try again.');
+            }
+
+            let result;
+            try {
+                result = await actor.createUser(username, displayName);
+            } catch (err: unknown) {
+                const msg = err instanceof Error ? err.message : String(err);
+                // Surface transient connection errors with a friendly message
+                if (
+                    msg.includes('fetch') ||
+                    msg.includes('network') ||
+                    msg.includes('timeout') ||
+                    msg.includes('Failed to fetch') ||
+                    msg.toLowerCase().includes('connection')
+                ) {
+                    throw new Error('Connection not ready. Please try again.');
+                }
+                throw err;
+            }
+
             // Inspect the discriminated union — throw on error so the component's
             // catch block receives a proper Error with the backend message.
             if (result.__kind__ === 'authenticationError') {
                 throw new Error(result.authenticationError);
+            }
+            if (result.__kind__ === 'usernameTaken') {
+                // Use a special prefix so RegistrationScreen can detect it
+                throw new Error('USERNAME_TAKEN:' + result.usernameTaken);
             }
             // result.__kind__ === 'userProfile'
             return result.userProfile;

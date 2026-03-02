@@ -22,7 +22,8 @@ export interface ConversationView {
   'conversationType' : ConversationType,
 }
 export type CreateUserResult = { 'authenticationError' : string } |
-  { 'userProfile' : UserProfile };
+  { 'userProfile' : UserProfile } |
+  { 'usernameTaken' : string };
 export type ExternalBlob = Uint8Array;
 export type FileType = { 'video' : null } |
   { 'document' : null } |

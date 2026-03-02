@@ -1,26 +1,35 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-02T04:08:39.925Z",
+  "generatedAt": "2026-03-02T06:00:01.760Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-35",
-        "summary": "In App.tsx and RegistrationScreen.tsx, fix the post-registration navigation flow so that immediately after a successful createUser call, the app transitions directly to the chat list (main screen) without any intermediate steps, loading screens, or delays. The currentUser/profile state must be updated synchronously or before the navigation check runs, so the app never loops back to the registration screen or gets stuck on a loading state.",
+        "id": "REQ-45",
+        "summary": "Fix the 'connection not ready, please try again' error that appears on the RegistrationScreen when the user submits their username and display name. The root cause is that the backend actor (canister connection) is not yet initialized or ready when the registration form is submitted. Ensure the actor is fully initialized before the registration form is interactable or before the createUser call is made. If the actor is still loading, show a loading indicator and disable the submit button rather than allowing the call to fail. If the actor becomes unavailable mid-session, surface a clear, actionable error message (e.g., 'Unable to connect. Please wait a moment and try again.') and allow the user to retry without leaving the registration screen.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/RegistrationScreen.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/RegistrationScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/RegistrationScreen.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/RegistrationScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-46",
+        "summary": "In useQueries.ts, audit the useActor hook usage within the registration mutation. Ensure the actor reference used in the createUser call is always the latest authenticated actor instance and is not undefined or uninitialized at the time of the call. Add a guard that throws a user-friendly error (e.g., 'Connection not ready. Please try again.') only if the actor is genuinely unavailable, and re-check actor readiness before every mutation call that touches the backend.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts"
         ]
       }
     ]
@@ -30,8 +39,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
     "frontend/src/components/RegistrationScreen.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

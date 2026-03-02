@@ -12,7 +12,6 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 
-
 // persistent actor state & data migration
 
 actor {
@@ -134,6 +133,7 @@ actor {
   // User Management
   public type CreateUserResult = {
     #authenticationError : Text;
+    #usernameTaken : Text;
     #userProfile : UserProfile;
   };
 
@@ -150,9 +150,7 @@ actor {
     // Check if username is already taken
     switch (userProfiles.get(username)) {
       case (?_) {
-        return #authenticationError(
-          "Username already exists. Please choose a different username"
-        );
+        return #usernameTaken("Username already exists. Please choose a different username");
       };
       case (null) {};
     };
@@ -549,3 +547,4 @@ actor {
     AccessControl.assignRole(accessControlState, caller, user, role);
   };
 };
+

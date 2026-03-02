@@ -1,11 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the post-registration navigation flow so the app immediately transitions to the chat list screen after a successful account creation.
+**Goal:** Fix the "connection not ready, please try again" error on the Registration screen by ensuring the backend actor is fully initialized before allowing form submission.
 
 **Planned changes:**
-- Update `App.tsx` to ensure `currentUser`/profile state is populated before the navigation logic evaluates which screen to render.
-- Update `RegistrationScreen.tsx` so that after a successful `createUser` call, the state update and navigation to the chat list happen immediately without intermediate steps, loading screens, or delays.
-- Ensure failed registration keeps the user on the registration screen with a readable error message.
+- Disable the registration form's submit button while the backend actor/connection is initializing
+- Show a loading indicator on the Registration screen while the actor is initializing
+- Enable the submit button only once the actor is ready
+- In `useQueries.ts`, add a guard in the `createUser` mutation to check that the actor is defined and non-null before invoking the canister method
+- If the actor is unavailable at mutation time, surface a clear, actionable inline error message (e.g., "Unable to connect. Please wait a moment and try again.") without crashing the app or leaving the registration screen
+- If the actor fails to initialize within a reasonable timeout, show a retry message inline on the registration form
 
-**User-visible outcome:** After successfully submitting the registration form, the user is taken directly to the chat list (main screen) with no loading screens or redirect back to the registration screen.
+**User-visible outcome:** Users can complete registration without encountering a "connection not ready" error; the form is disabled with a loading indicator while the connection initializes, and once ready the submission proceeds successfully, navigating the user to the chat list screen.

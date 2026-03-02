@@ -1,27 +1,41 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix post-registration navigation to immediately open chat list",
+  "title": "Fix 'connection not ready' error on Registration screen",
   "requirements": [
     {
-      "id": "REQ-35",
-      "summary": "Fix the post-registration navigation flow so that after a successful createUser call, the app transitions directly to the chat list screen without intermediate loading states or loops back to registration",
+      "id": "REQ-45",
+      "summary": "Fix the 'connection not ready, please try again' error on RegistrationScreen by ensuring the backend actor is fully initialized before allowing registration form submission",
       "acceptanceCriteria": [
-        "After submitting the registration form and receiving a successful response from createUser, the app immediately renders the chat list screen.",
-        "The user is never shown a loading screen or redirected back to the registration screen after successful account creation.",
-        "The currentUser/profile state is populated before the navigation logic evaluates which screen to show.",
-        "If registration fails, the user remains on the registration screen and sees a readable error message."
+        "The registration form's submit button is disabled while the backend actor/connection is not yet ready.",
+        "A loading indicator is shown on the registration screen while the actor is initializing.",
+        "Once the actor is ready, the submit button becomes enabled and the user can register without any 'connection not ready' error.",
+        "If the actor fails to initialize within a reasonable timeout, a clear retry message is shown inline on the registration form.",
+        "Submitting the form with a valid username and display name successfully calls createUser on the backend without throwing a connection error.",
+        "After a successful createUser call, the app navigates to the chat list screen immediately."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/RegistrationScreen.tsx",
           "operation": "modify",
-          "description": "Update the registration mutation's onSuccess callback to immediately invalidate and refetch the currentUserProfile query, ensuring the profile state is updated before any navigation logic runs. Add proper error handling to display user-friendly error messages on registration failure and prevent navigation when errors occur."
-        },
+          "description": "Add actor readiness checks to the registration form component. Import the useActor hook and destructure both actor and isFetching state. Disable the submit button while isFetching is true or actor is null/undefined. Display a loading spinner or text (e.g., 'Connecting...') while the actor is initializing. Only enable the submit button once the actor is ready and defined. If the actor becomes unavailable after initial load, show an inline error message ('Unable to connect. Please wait a moment and try again.') with a retry option that does not navigate away from the registration screen. Ensure the createUser mutation is only invoked when the actor is confirmed ready."
+        }
+      ]
+    },
+    {
+      "id": "REQ-46",
+      "summary": "Audit and fix the useCreateUser mutation in useQueries.ts to ensure the actor is always defined and initialized before invoking createUser",
+      "acceptanceCriteria": [
+        "The createUser mutation in useQueries.ts checks that the actor is defined and non-null before invoking the canister method.",
+        "If the actor is undefined at mutation time, the error message shown is readable (e.g., 'Connection not ready. Please try again.') and does not crash the app.",
+        "When the actor is properly initialized, the mutation proceeds and completes without any 'connection not ready' error.",
+        "No unhandled promise rejection or console error occurs when the actor is briefly unavailable during initialization."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Refactor the screen rendering logic to ensure that after a successful registration (when userProfile is non-null), the app immediately shows the chat list screen. Remove or adjust any conditions that cause intermediate loading states or loops back to the registration screen. Ensure the navigation logic correctly evaluates the currentUser/profile state synchronously after it has been populated by the registration flow."
+          "description": "Audit the useCreateUser mutation (or equivalent registration mutation). Before calling actor.createUser, add a guard that checks if actor is defined and non-null. If actor is undefined or null at mutation time, throw a user-friendly error with the message 'Connection not ready. Please try again.' (do not use technical jargon or expose internal state). Wrap the createUser call in a try-catch block to handle any transient connection errors gracefully. Ensure the mutation does not proceed if the actor reference is stale or uninitialized. This prevents unhandled promise rejections and ensures a clear, actionable error is surfaced to the UI layer when the backend connection is not ready."
         }
       ]
     }
