@@ -92,6 +92,7 @@ export interface _SERVICE {
   'createGroupChat' : ActorMethod<[Array<UserId>, string], ConversationView>,
   'createOneOnOneConversation' : ActorMethod<[UserId], ConversationView>,
   'createUser' : ActorMethod<[string, string], CreateUserResult>,
+  'getAllUsers' : ActorMethod<[], Array<UserProfile>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getContactById' : ActorMethod<[string], [] | [UserProfile]>,

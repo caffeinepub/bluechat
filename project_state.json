@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 19,
-  "summary": "A WhatsApp-like full-featured messaging app named 'Xeta' with real-time chat, user accounts, contacts, media sharing, and other core WhatsApp-style features. This replaces the previous Bluetooth-based messaging concept.",
+  "projectStateVersion": 25,
+  "summary": "A WhatsApp-like full-featured messaging app named 'Xeta' with real-time chat, user accounts, contacts, media sharing, and other core WhatsApp-style features. Includes WhatsApp-style bottom navigation (Chats, Updates, Calls, Settings), a pinned Xeta AI chat entry at the top of the chat list, searchable/persistent user storage, larger logo in the top bar, and footer copyright removed.",
   "architectural_notes": [
     "Replacing Bluetooth-based architecture with internet-based real-time messaging using WebSockets or similar technology",
     "Requires backend user authentication, message storage, and real-time event broadcasting"
@@ -203,6 +203,54 @@
         "REQ-26"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-xeta-ai-entry-pinned-at-the-very-top-of-the-chat-list-screen-above-the-new-chat-button-it-should-appear-as-a-special-bot-contact-row-with-an-avatar-icon-labeled-xeta-ai-tapping-it-opens-a-chat-thread-where-the-user-can-send-messages-and-receive-simulated-ai-responses-rule-based-or-canned-responses-this-entry-must-always-be-visible-and-never-filtered-out-by-search",
+      "title": "Add a dedicated 'Xeta AI' entry pinned at the very top of the chat list screen, above the 'New Chat' button. It should appear as a special bot contact row with an avatar/icon labeled 'Xeta AI'. Tapping it opens a chat thread where the user can send messages and receive simulated AI responses (rule-based or canned responses). This entry must always be visible and never filtered out by search.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-app-footer-bottom-area-with-a-whatsapp-style-bottom-navigation-bar-containing-four-tabs-chats-shows-the-main-chat-list-updates-shows-a-placeholder-status-stories-section-calls-shows-a-placeholder-call-history-section-and-settings-shows-the-app-settings-and-profile-screen-each-tab-must-have-a-recognizable-icon-and-label-the-active-tab-must-be-visually-highlighted-the-bottom-nav-must-be-present-on-all-main-screens-after-login",
+      "title": "Replace the current app footer/bottom area with a WhatsApp-style bottom navigation bar containing four tabs: Chats (shows the main chat list), Updates (shows a placeholder status/stories section), Calls (shows a placeholder call history section), and Settings (shows the app settings and profile screen). Each tab must have a recognizable icon and label. The active tab must be visually highlighted. The bottom nav must be present on all main screens after login.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-search-filter-bar-at-the-top-of-the-chat-list-screen-that-allows-users-to-search-for-any-registered-user-by-display-name-or-username-the-search-should-query-all-users-stored-in-the-backend-matching-users-not-yet-in-a-conversation-should-appear-as-results-that-can-be-tapped-to-start-a-new-chat",
+      "title": "Add a search/filter bar at the top of the chat list screen that allows users to search for any registered user by display name or username. The search should query all users stored in the backend. Matching users not yet in a conversation should appear as results that can be tapped to start a new chat.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-increase-the-size-of-the-xeta-logo-image-displayed-in-the-app-top-bar-so-it-is-larger-and-more-prominent-the-logo-height-should-be-increased-to-approximately-48-to-56px-while-maintaining-its-aspect-ratio-and-remaining-vertically-centered-alongside-the-xeta-app-name-text",
+      "title": "Increase the size of the Xeta logo image displayed in the app top bar so it is larger and more prominent. The logo height should be increased to approximately 48 to 56px while maintaining its aspect ratio and remaining vertically centered alongside the 'Xeta' app name text.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-any-remaining-footer-copyright-section-or-copyright-text-from-the-app-no-copyright-line-or-footer-element-should-appear-on-any-screen",
+      "title": "Remove any remaining footer copyright section or copyright text from the app. No copyright line or footer element should appear on any screen.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-app-tsx-and-registrationscreen-tsx-fix-the-post-registration-navigation-flow-so-that-immediately-after-a-successful-createuser-call-the-app-transitions-directly-to-the-chat-list-main-screen-without-any-intermediate-steps-loading-screens-or-delays-the-currentuser-profile-state-must-be-updated-synchronously-or-before-the-navigation-check-runs-so-the-app-never-loops-back-to-the-registration-screen-or-gets-stuck-on-a-loading-state",
+      "title": "In App.tsx and RegistrationScreen.tsx, fix the post-registration navigation flow so that immediately after a successful createUser call, the app transitions directly to the chat list (main screen) without any intermediate steps, loading screens, or delays. The currentUser/profile state must be updated synchronously or before the navigation check runs, so the app never loops back to the registration screen or gets stuck on a loading state.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -268,6 +316,64 @@
       "reqIds": [
         "REQ-27"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Change the logo position/layout in the app header and increase the logo size to match the 'Xeta' text size",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "In App.tsx, move the Xeta logo image so it appears to the left of (or inline with) the 'Xeta' app name text in the header, and increase the logo's rendered size so its height visually matches the font size of the 'Xeta' heading text. Both the logo and the text must remain vertically centered and aligned side-by-side.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Add Xeta AI chat entry pinned at the top of the chat list (above New Chat button) that opens an AI-powered chat thread named 'Xeta AI'",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Add WhatsApp-style bottom navigation bar with four tabs: Chats (chat list), Updates (status/stories), Calls (call history), Settings (app settings & profile), each with matching icons",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Add searchable users feature on the chat list screen — search/filter bar to find any registered user by name or username, with all users permanently stored in the backend for persistent accessibility",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "Increase the logo size in the app top bar to be larger/more prominent",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "Remove the footer copyright section from the app",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Ensure all registered users are permanently and persistently stored in the backend using upgrade-safe stable data structures (stable var backup arrays). Expose a searchUsers or getAllUsers query function on the backend actor so the frontend can retrieve all registered users for search and contact discovery.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "After successful account creation/registration, automatically navigate the user directly to the chat list main page without any intermediate steps or delays",
+      "reqIds": [],
       "status": "pending"
     }
   ],

@@ -109,6 +109,20 @@ export function useGetContactById(userId: string | null) {
     });
 }
 
+export function useGetAllUsers() {
+    const { actor, isFetching } = useActor();
+
+    return useQuery<UserProfile[]>({
+        queryKey: ['allUsers'],
+        queryFn: async () => {
+            if (!actor) return [];
+            return actor.getAllUsers();
+        },
+        enabled: !!actor && !isFetching,
+        staleTime: 30_000,
+    });
+}
+
 // ─── Conversations ────────────────────────────────────────────────────────────
 
 export function useGetMyConversations() {

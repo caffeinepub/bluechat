@@ -1,76 +1,36 @@
 {
   "kind": "build_request",
-  "title": "Fix registration failure and post-registration navigation",
+  "title": "Fix post-registration navigation to immediately open chat list",
+  "projectName": "Xeta",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-25",
-      "text": "Fix the registration flow in RegistrationScreen.tsx so that calling createUser on the backend succeeds without errors. Add proper error handling that surfaces a readable error message to the user if registration fails, and ensure the component correctly awaits the mutation result before attempting navigation.",
+      "id": "REQ-35",
+      "text": "In App.tsx and RegistrationScreen.tsx, fix the post-registration navigation flow so that immediately after a successful createUser call, the app transitions directly to the chat list (main screen) without any intermediate steps, loading screens, or delays. The currentUser/profile state must be updated synchronously or before the navigation check runs, so the app never loops back to the registration screen or gets stuck on a loading state.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "Registration failed on registration screen while not opening the next screen."
+          "once account created successfully app should open chat list main page directly"
         ]
       },
       "acceptanceCriteria": [
-        "Submitting a valid display name and username on the registration screen calls createUser on the backend without throwing an unhandled error.",
-        "If createUser returns an error variant or throws, a readable error message is displayed inline on the registration form.",
-        "If createUser succeeds, the app immediately navigates to the chat list screen without delay.",
-        "The registration button is disabled while the mutation is in-flight to prevent double submission.",
-        "No console errors related to undefined actor, missing principal, or unhandled promise rejection appear during registration."
-      ]
-    },
-    {
-      "id": "REQ-26",
-      "text": "Fix the post-registration navigation in App.tsx so that after a successful createUser call, the app transitions from the registration screen to the chat list screen immediately. Ensure the currentUser / profile state is updated before the navigation check runs, so the app does not loop back to registration or get stuck on a loading screen.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "Registration failed on registration screen while not opening the next screen."
-        ]
-      },
-      "acceptanceCriteria": [
-        "After successful registration, the app displays the chat list screen without requiring a manual page refresh.",
-        "The app does not re-render back to the registration screen after a successful createUser call.",
-        "The app does not show an indefinite loading spinner after registration completes.",
-        "The user's newly created profile is available in app state immediately after navigation to the chat list screen."
-      ]
-    },
-    {
-      "id": "REQ-27",
-      "text": "Audit and fix the backend createUser function in backend/main.mo to ensure it correctly handles duplicate username and principal checks, returns a clear error variant when registration fails, and persists the new user record reliably so subsequent getMyProfile calls return the newly created profile.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "Registration failed on registration screen while not opening the next screen."
-        ]
-      },
-      "acceptanceCriteria": [
-        "createUser returns an #ok variant with the new user profile when registration succeeds.",
-        "createUser returns an #err variant with a descriptive message when the username is already taken.",
-        "createUser returns an #err variant when the caller's principal is already registered.",
-        "A call to getMyProfile immediately after a successful createUser returns the newly created profile.",
-        "No trap or unhandled error occurs in the actor during a normal registration call."
+        "After submitting the registration form and receiving a successful response from createUser, the app immediately renders the chat list screen.",
+        "The user is never shown a loading screen or redirected back to the registration screen after successful account creation.",
+        "The currentUser/profile state is populated before the navigation logic evaluates which screen to show.",
+        "If registration fails, the user remains on the registration screen and sees a readable error message."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Keep all Motoko logic in backend/main.mo as a single actor."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Changing the registration form fields or visual design.",
-    "Implementing phone/email-based authentication.",
-    "Modifying any other screen besides RegistrationScreen.tsx and the navigation logic in App.tsx."
+    "Changing the registration form fields or validation logic.",
+    "Modifying the backend createUser function.",
+    "Altering the chat list screen UI."
   ],
   "imageRequirements": {
     "required": [],

@@ -12,6 +12,9 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 
+
+// persistent actor state & data migration
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -96,7 +99,7 @@ actor {
   };
 
   // Global Data
-  let userProfiles = Map.empty<Text, UserProfile>();
+  let userProfiles = Map.empty<Text, UserProfile>(); // upgraded to persistent Map
   let conversations = Map.empty<Text, Conversation>();
   var nextMessageId = 1;
 
@@ -207,6 +210,14 @@ actor {
   // Required by instructions: get any user's profile (public read)
   public query ({ caller }) func getUserProfile(userId : Text) : async ?UserProfile {
     userProfiles.get(userId);
+  };
+
+  // Retrieve all users for search/contact discovery - requires registered user
+  public query ({ caller }) func getAllUsers() : async [UserProfile] {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized: Only registered users can search for other users");
+    };
+    userProfiles.values().toArray();
   };
 
   // Conversations

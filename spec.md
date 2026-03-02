@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the registration flow so that user creation succeeds, errors are surfaced properly, and the app navigates to the chat list screen after successful registration.
+**Goal:** Fix the post-registration navigation flow so the app immediately transitions to the chat list screen after a successful account creation.
 
 **Planned changes:**
-- Fix `RegistrationScreen.tsx` to correctly await the `createUser` mutation, disable the submit button during submission, and display readable inline error messages on failure
-- Fix `App.tsx` navigation logic so that after a successful `createUser` call the app transitions to the chat list screen immediately, without looping back to registration or getting stuck on a loading spinner
-- Audit and fix `backend/main.mo` `createUser` function to return `#ok` with the new profile on success, return descriptive `#err` variants for duplicate username or already-registered principal, and persist the user record so subsequent `getMyProfile` calls return the new profile
+- Update `App.tsx` to ensure `currentUser`/profile state is populated before the navigation logic evaluates which screen to render.
+- Update `RegistrationScreen.tsx` so that after a successful `createUser` call, the state update and navigation to the chat list happen immediately without intermediate steps, loading screens, or delays.
+- Ensure failed registration keeps the user on the registration screen with a readable error message.
 
-**User-visible outcome:** A user can complete registration by entering a display name and username, and is immediately taken to the chat list screen without errors, refresh, or infinite loading.
+**User-visible outcome:** After successfully submitting the registration form, the user is taken directly to the chat list (main screen) with no loading screens or redirect back to the registration screen.

@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateUser } from '../hooks/useQueries';
+import type { UserProfile } from '../backend';
 
 interface RegistrationScreenProps {
-    onRegistered: () => void;
+    onRegistered: (profile: UserProfile) => void;
 }
 
 export function RegistrationScreen({ onRegistered }: RegistrationScreenProps) {
@@ -55,10 +56,13 @@ export function RegistrationScreen({ onRegistered }: RegistrationScreenProps) {
         }
 
         try {
-            // mutationFn now throws on #authenticationError and returns UserProfile on success
-            await createUser.mutateAsync({ username: trimmedUsername, displayName: trimmedDisplayName });
-            // Only reach here on success — navigate to chat list
-            onRegistered();
+            // mutationFn returns the UserProfile on success, throws on error
+            const profile = await createUser.mutateAsync({
+                username: trimmedUsername,
+                displayName: trimmedDisplayName,
+            });
+            // Pass the profile directly so App.tsx can immediately show the chat list
+            onRegistered(profile);
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             // Surface the backend error message directly; it's already human-readable

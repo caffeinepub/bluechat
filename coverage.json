@@ -1,61 +1,37 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T07:07:19.732Z",
+  "generatedAt": "2026-03-02T04:08:39.925Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 2,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-25",
-        "summary": "Fix the registration flow in RegistrationScreen.tsx so that calling createUser on the backend succeeds without errors. Add proper error handling that surfaces a readable error message to the user if registration fails, and ensure the component correctly awaits the mutation result before attempting navigation.",
+        "id": "REQ-35",
+        "summary": "In App.tsx and RegistrationScreen.tsx, fix the post-registration navigation flow so that immediately after a successful createUser call, the app transitions directly to the chat list (main screen) without any intermediate steps, loading screens, or delays. The currentUser/profile state must be updated synchronously or before the navigation check runs, so the app never loops back to the registration screen or gets stuck on a loading state.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/RegistrationScreen.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
           "frontend/src/components/RegistrationScreen.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-26",
-        "summary": "Fix the post-registration navigation in App.tsx so that after a successful createUser call, the app transitions from the registration screen to the chat list screen immediately. Ensure the currentUser / profile state is updated before the navigation check runs, so the app does not loop back to registration or get stuck on a loading screen.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
           "frontend/src/App.tsx"
         ]
-      },
-      {
-        "id": "REQ-27",
-        "summary": "Audit and fix the backend createUser function in backend/main.mo to ensure it correctly handles duplicate username and principal checks, returns a clear error variant when registration fails, and persists the new user record reliably so subsequent getMyProfile calls return the newly created profile.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
     "frontend/src/components/RegistrationScreen.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

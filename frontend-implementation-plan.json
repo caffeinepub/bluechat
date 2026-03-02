@@ -1,45 +1,27 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix registration failure and post-registration navigation",
+  "title": "Fix post-registration navigation to immediately open chat list",
   "requirements": [
     {
-      "id": "REQ-25",
-      "summary": "Fix the registration flow in RegistrationScreen.tsx to ensure createUser succeeds, add proper error handling, and await mutation result before navigation",
+      "id": "REQ-35",
+      "summary": "Fix the post-registration navigation flow so that after a successful createUser call, the app transitions directly to the chat list screen without intermediate loading states or loops back to registration",
       "acceptanceCriteria": [
-        "Submitting a valid display name and username on the registration screen calls createUser on the backend without throwing an unhandled error.",
-        "If createUser returns an error variant or throws, a readable error message is displayed inline on the registration form.",
-        "If createUser succeeds, the app immediately navigates to the chat list screen without delay.",
-        "The registration button is disabled while the mutation is in-flight to prevent double submission.",
-        "No console errors related to undefined actor, missing principal, or unhandled promise rejection appear during registration."
+        "After submitting the registration form and receiving a successful response from createUser, the app immediately renders the chat list screen.",
+        "The user is never shown a loading screen or redirected back to the registration screen after successful account creation.",
+        "The currentUser/profile state is populated before the navigation logic evaluates which screen to show.",
+        "If registration fails, the user remains on the registration screen and sees a readable error message."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/RegistrationScreen.tsx",
           "operation": "modify",
-          "description": "Fix the registration flow to properly await the createUser mutation result before attempting navigation. Add error handling that checks if the mutation result is an error variant (#authenticationError) and displays a readable error message inline on the form. Ensure the submit button is disabled while the mutation is in-flight (isPending state). Handle the success case by checking for the #userProfile variant before triggering navigation. Add a local error state to store and display backend error messages."
+          "description": "Update the registration mutation's onSuccess callback to immediately invalidate and refetch the currentUserProfile query, ensuring the profile state is updated before any navigation logic runs. Add proper error handling to display user-friendly error messages on registration failure and prevent navigation when errors occur."
         },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Review and update the createUser mutation hook to ensure it properly handles the CreateUserResult discriminated union type returned by the backend. The mutation should not throw on error variants; instead, it should return the raw result so the component can inspect whether it's #authenticationError or #userProfile. Ensure the mutation invalidates the 'currentUserProfile' query key on success to trigger profile refetch."
-        }
-      ]
-    },
-    {
-      "id": "REQ-26",
-      "summary": "Fix post-registration navigation in App.tsx to transition from registration to chat list immediately after successful createUser",
-      "acceptanceCriteria": [
-        "After successful registration, the app displays the chat list screen without requiring a manual page refresh.",
-        "The app does not re-render back to the registration screen after a successful createUser call.",
-        "The app does not show an indefinite loading spinner after registration completes.",
-        "The user's newly created profile is available in app state immediately after navigation to the chat list screen."
-      ],
-      "file_operations": [
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Fix the navigation logic to ensure that after a successful createUser call, the currentUser state is updated before the component re-renders. Review the profile loading flow and ensure the 15-second timeout/retry fallback does not interfere with immediate post-registration navigation. Ensure that when the profile query refetches after registration (triggered by query invalidation), the loading and screen-selection logic correctly transitions to the chat list screen without looping back to registration or showing an indefinite spinner. Consider adding a query refetch trigger or ensuring the profile query is marked as stale after registration completes."
+          "description": "Refactor the screen rendering logic to ensure that after a successful registration (when userProfile is non-null), the app immediately shows the chat list screen. Remove or adjust any conditions that cause intermediate loading states or loops back to the registration screen. Ensure the navigation logic correctly evaluates the currentUser/profile state synchronously after it has been populated by the registration flow."
         }
       ]
     }

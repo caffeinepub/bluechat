@@ -86,6 +86,7 @@ export interface backendInterface {
     createGroupChat(participants: Array<UserId>, groupName: string): Promise<ConversationView>;
     createOneOnOneConversation(otherUserId: UserId): Promise<ConversationView>;
     createUser(username: string, displayName: string): Promise<CreateUserResult>;
+    getAllUsers(): Promise<Array<UserProfile>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getContactById(userId: string): Promise<UserProfile | null>;
